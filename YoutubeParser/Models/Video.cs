@@ -12,7 +12,6 @@ namespace YoutubeParser.Models
         public string Title { get; set; } = "";
         public string PublishedTime { get; set; } = "";
         public string ViewCount { get; set; } = "";
-        public string ShortViewCount { get; set; } = "";
         public string Duration { get; set; } = "";
         public List<Thumbnail> Thumbnails { get; set; } = new List<Thumbnail>();
         public List<Thumbnail> RichThumbnails { get; set; } = new List<Thumbnail>();
