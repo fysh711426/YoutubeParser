@@ -1,5 +1,6 @@
-﻿using YoutubeParser;
-using YoutubeParser.Models;
+﻿using System.Globalization;
+using YoutubeParser;
+using YoutubeParser.Channels;
 
 namespace Example
 {
@@ -7,24 +8,27 @@ namespace Example
     {
         public static async Task Main(string[] args)
         {
-            var channel = new YoutubeChannel("UrlOrChannelId");
+            var channelUrl = "UrlOrChannelId";
 
-            // Get About
-            var about = await channel.GetAboutAsync();
+            var youtube = new YoutubeClient();
 
-            // Get Videos
-            var videoList = new List<Video>();
-            var enumerable = channel.GetVideosAsync();
+            // Get Channel
+            var channel = await youtube.Channel.GetAsync(channelUrl);
+
+            // Get Channel Videos
+            var videoList = new List<ChannelVideo>();
+            var enumerable = youtube.Channel.GetVideosAsync(channelUrl);
             await foreach (var item in enumerable)
             {
+                var x = item.ViewCount;
                 videoList.Add(item);
             }
 
             // NET45 or NET46
-            var videos = await channel.GetVideosListAsync();
+            var videos = await youtube.Channel.GetVideosListAsync(channelUrl);
             while (true)
             {
-                var nextVideos = await channel.GetNextVideosListAsync();
+                var nextVideos = await youtube.Channel.GetNextVideosListAsync();
                 if (nextVideos == null)
                     break;
                 videos.AddRange(nextVideos);

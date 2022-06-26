@@ -1,0 +1,75 @@
+﻿using System;
+using System.Collections.Generic;
+using System.Globalization;
+using System.Linq;
+using System.Text;
+using System.Text.RegularExpressions;
+using System.Threading.Tasks;
+
+namespace YoutubeParser.Extensions
+{
+    internal static class YoutubeExtractorExtension
+    {
+        internal static bool GetIsLive(this string publishedTime)
+        {
+            return publishedTime == "";
+        }
+
+        internal static bool GetIsStream(this string publishedTime)
+        {
+            return publishedTime.Contains("Streamed");
+        }
+
+        internal static long GetCountValue(this string viewCount)
+        {
+            var val = viewCount
+                .Pipe(it => Regex.Match(it, @"([\d,]+)"))
+                .Select(m => m.Groups[1].Value)
+                .Pipe(it => it.Replace(",", ""))
+                .Pipe(it => it == "" ? 0 : double.Parse(it));
+            if (viewCount.Contains("M"))
+                return (long)(val * 1000000);
+            if (viewCount.Contains("K"))
+                return (long)(val * 1000);
+            return (long)val;
+        }
+
+        internal static TimeSpan GetDuration(this string duration)
+        {
+            var formats = new string[]
+                { @"m\:ss", @"mm\:ss", @"h\:mm\:ss", @"hh\:mm\:ss" };
+            return TimeSpan.ParseExact(duration, formats, DateTimeFormatInfo.InvariantInfo);
+        }
+
+        internal static DateTime GetJoinedDate(this string joinedDate)
+        {
+            return DateTime.Parse(joinedDate, DateTimeFormatInfo.InvariantInfo);
+        }
+        
+        internal static long GetPublishedTimeSeconds(this string publishedTime)
+        {
+            var val = publishedTime
+                .Pipe(it => Regex.Match(it, @"(\d+)"))
+                .Select(m => m.Groups[1].Value)
+                .Pipe(it => it == "" ? 0 : int.Parse(it));
+
+            var seconds = 0;
+            if (publishedTime.Contains("second"))
+                seconds = val * 1;
+            if (publishedTime.Contains("minute"))
+                seconds = val * 1 * 60;
+            if (publishedTime.Contains("hour"))
+                seconds = val * 1 * 60 * 60;
+            if (publishedTime.Contains("day"))
+                seconds = val * 1 * 60 * 60 * 24;
+            if (publishedTime.Contains("week"))
+                seconds = val * 1 * 60 * 60 * 24 * 7;
+            if (publishedTime.Contains("month"))
+                seconds = val * 1 * 60 * 60 * 24 * 30;
+            if (publishedTime.Contains("year"))
+                seconds = val * 1 * 60 * 60 * 24 * 365;
+
+            return seconds;
+        }
+    }
+}

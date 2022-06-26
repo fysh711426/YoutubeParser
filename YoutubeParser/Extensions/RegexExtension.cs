@@ -4,7 +4,7 @@ using System.Text.RegularExpressions;
 
 namespace YoutubeParser.Extensions
 {
-    internal static class RegexExtensions
+    internal static class RegexExtension
     {
         internal static TResult Select<TResult>(this Match match, Func<Match, TResult> selector)
         {
