@@ -10,11 +10,6 @@ namespace YoutubeParser.Extensions
 {
     internal static class YoutubeExtractorExtension
     {
-        internal static bool GetIsLive(this string publishedTime)
-        {
-            return publishedTime == "";
-        }
-
         internal static bool GetIsStream(this string publishedTime)
         {
             return publishedTime.Contains("Streamed");
@@ -34,11 +29,13 @@ namespace YoutubeParser.Extensions
             return (long)val;
         }
 
-        internal static TimeSpan GetDuration(this string duration)
+        internal static TimeSpan? GetDuration(this string duration)
         {
             var formats = new string[]
                 { @"m\:ss", @"mm\:ss", @"h\:mm\:ss", @"hh\:mm\:ss" };
-            return TimeSpan.ParseExact(duration, formats, DateTimeFormatInfo.InvariantInfo);
+            return TimeSpan.TryParseExact(
+                duration, formats, DateTimeFormatInfo.InvariantInfo, out var result)
+                    ? result : null;
         }
 
         internal static DateTime GetJoinedDate(this string joinedDate)

@@ -26,7 +26,7 @@ namespace YoutubeParser.Parser
         {
             var url = $"{GetChannelUrl(urlOrChannelId)}/about";
             using var request = new HttpRequestMessage(HttpMethod.Get, url);
-            request.Headers.Add("Cookie", $"PREF=hl={hl}&gl={gl}");
+            request.Headers.Add("Cookie", $"PREF=hl={hl}");
             using var response = await _httpClient.SendAsync(request, HttpCompletionOption.ResponseHeadersRead);
             response.EnsureSuccessStatusCode();
             var html = await response.Content.ReadAsStringAsync();
@@ -86,8 +86,15 @@ namespace YoutubeParser.Parser
 
         private ChannelVideo MapVideo(JToken? grid)
         {
-            var publishedTime = grid?["publishedTimeText"]?["simpleText"]?
-                .Value<string>() ?? "";
+            var duration = grid?["thumbnailOverlays"]?[0]?["thumbnailOverlayTimeStatusRenderer"]?["text"]?["simpleText"]?.Value<string>();
+            var publishedTime = grid?["publishedTimeText"]?["simpleText"]?.Value<string>();
+            var viewCount = grid?["viewCountText"]?["simpleText"]?.Value<string>()?.GetCountValue() ?? 0;
+            var liveViewCount = grid?["viewCountText"]?["runs"]?.FirstOrDefault()?["text"]?.Value<string>()?.GetCountValue() ?? 0;
+            var timeStyle = grid?["thumbnailOverlays"]?[0]?["thumbnailOverlayTimeStatusRenderer"]?["style"]?.Value<string>();
+            var isStream = publishedTime?.Contains("Streamed") ?? false;
+            var isLive = timeStyle == "LIVE";
+            var isShorts = duration == "SHORTS";
+
             return new ChannelVideo
             {
                 VideoId = grid?["videoId"]?.Value<string>() ?? "",
@@ -110,12 +117,13 @@ namespace YoutubeParser.Parser
                         Height = it?["height"]?.Value<int>() ?? 0
                     })
                     .ToList() ?? new List<Thumbnail>(),
-                ViewCount = grid?["viewCountText"]?["simpleText"]?.Value<string>()?.GetCountValue() ?? 0,
-                Duration = grid?["thumbnailOverlays"]?[0]?["thumbnailOverlayTimeStatusRenderer"]?["text"]?["simpleText"]?.Value<string>()?.GetDuration() ?? TimeSpan.Zero,
-                PublishedTime = publishedTime,
+                PublishedTime = publishedTime ?? "",
                 PublishedTimeSeconds = publishedTime?.GetPublishedTimeSeconds() ?? 0,
-                IsStream = publishedTime?.GetIsStream() ?? false,
-                IsLive = publishedTime?.GetIsLive() ?? false,
+                IsShorts = isShorts,
+                Duration = !isShorts ? duration?.GetDuration() : null,
+                IsLive = isLive,
+                IsStream = isLive || isStream,
+                ViewCount = isLive ? liveViewCount : viewCount
             };
         }
 
@@ -123,7 +131,7 @@ namespace YoutubeParser.Parser
         {
             var url = $"{GetChannelUrl(urlOrChannelId)}/videos";
             using var request = new HttpRequestMessage(HttpMethod.Get, url);
-            request.Headers.Add("Cookie", $"PREF=hl={hl}&gl={gl}");
+            request.Headers.Add("Cookie", $"PREF=hl={hl}");
             using var response = await _httpClient.SendAsync(request, HttpCompletionOption.ResponseHeadersRead);
             response.EnsureSuccessStatusCode();
             var html = await response.Content.ReadAsStringAsync();

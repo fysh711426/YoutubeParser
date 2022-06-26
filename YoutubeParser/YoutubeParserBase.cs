@@ -12,7 +12,7 @@ namespace YoutubeParser
     public abstract class YoutubeParserBase
     {
         protected static readonly string hl = "en";
-        protected static readonly string gl = "US";
+        //protected static readonly string gl = "US";
         protected static readonly string apiKey = "AIzaSyAO_FJ2SlqU8Q4STEHLGCilw_Y9_11qcW8";
         protected static readonly string userAgent =
             @"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/97.0.4692.99 Safari/537.36";

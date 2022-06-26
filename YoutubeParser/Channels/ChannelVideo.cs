@@ -12,12 +12,13 @@ namespace YoutubeParser.Channels
     {
         public string VideoId { get; set; } = "";
         public string Title { get; set; } = "";
-        public TimeSpan Duration { get; set; }
+        public TimeSpan? Duration { get; set; }
         public List<Thumbnail> Thumbnails { get; set; } = new List<Thumbnail>();
         public List<Thumbnail> RichThumbnails { get; set; } = new List<Thumbnail>();
         public long ViewCount { get; set; }
         public string PublishedTime { get; set; } = "";
         public long PublishedTimeSeconds { get; set; }
+        public bool IsShorts { get; set; }
         public bool IsStream { get; set; }
         public bool IsLive { get; set; }
     }
