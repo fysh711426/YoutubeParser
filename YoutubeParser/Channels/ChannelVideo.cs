@@ -8,18 +8,33 @@ using YoutubeParser.Models;
 
 namespace YoutubeParser.Channels
 {
+    public enum VideoType
+    {
+        Video,
+        Stream
+    }
+
+    public enum VideoStatus
+    {
+        Default,
+        Live,
+        Upcoming
+    }
+
     public class ChannelVideo
     {
         public string VideoId { get; set; } = "";
         public string Title { get; set; } = "";
+        public VideoType VideoType { get; set; }
+        public VideoStatus VideoStatus { get; set; }
+        public bool IsShorts { get; set; }
         public TimeSpan? Duration { get; set; }
         public List<Thumbnail> Thumbnails { get; set; } = new List<Thumbnail>();
-        public List<Thumbnail> RichThumbnails { get; set; } = new List<Thumbnail>();
+        public Thumbnail? RichThumbnail { get; set; }
         public long ViewCount { get; set; }
         public string PublishedTime { get; set; } = "";
         public long PublishedTimeSeconds { get; set; }
-        public bool IsShorts { get; set; }
-        public bool IsStream { get; set; }
-        public bool IsLive { get; set; }
+        public string Url => $"https://www.youtube.com/watch?v={VideoId}";
+        public string ShortUrl => $"http://youtu.be/{VideoId}";
     }
 }

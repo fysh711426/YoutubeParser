@@ -20,5 +20,6 @@ namespace YoutubeParser.Channels
         public string CanonicalChannelUrl { get; set; } = "";
         public long ViewCount { get; set; }
         public long SubscriberCount { get; set; }
+        public string Url => $"https://www.youtube.com/channel/{ChannelId}";
     }
 }

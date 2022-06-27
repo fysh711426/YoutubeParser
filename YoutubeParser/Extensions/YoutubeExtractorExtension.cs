@@ -29,7 +29,7 @@ namespace YoutubeParser.Extensions
             return (long)val;
         }
 
-        internal static TimeSpan? GetDuration(this string duration)
+        internal static TimeSpan? TryGetDuration(this string duration)
         {
             var formats = new string[]
                 { @"m\:ss", @"mm\:ss", @"h\:mm\:ss", @"hh\:mm\:ss" };
@@ -38,9 +38,11 @@ namespace YoutubeParser.Extensions
                     ? result : null;
         }
 
-        internal static DateTime GetJoinedDate(this string joinedDate)
+        internal static DateTime? TryGetJoinedDate(this string joinedDate)
         {
-            return DateTime.Parse(joinedDate, DateTimeFormatInfo.InvariantInfo);
+            return DateTime.TryParse(joinedDate, DateTimeFormatInfo.InvariantInfo, 
+                DateTimeStyles.None, out var result)
+                    ? result : null;
         }
         
         internal static long GetPublishedTimeSeconds(this string publishedTime)

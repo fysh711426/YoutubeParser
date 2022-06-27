@@ -21,7 +21,7 @@ namespace YoutubeParser.Parser
         {
         }
 
-        // ----- GetAbout -----
+        // ----- GetChannel -----
         public async Task<Channel> GetAsync(string urlOrChannelId)
         {
             var url = $"{GetChannelUrl(urlOrChannelId)}/about";
@@ -39,91 +39,44 @@ namespace YoutubeParser.Parser
                     .Substring(0, it.Length - 1)
                     .Replace("var ytInitialData = ", ""));
             var data = JsonConvert.DeserializeObject<JObject>(json);
-            var header = data?["header"]?["c4TabbedHeaderRenderer"];
-            var aboutTab = data?["contents"]?["twoColumnBrowseResultsRenderer"]?["tabs"]?
-                .Values<JObject>()
-                .Where(it => it?["tabRenderer"]?["selected"]?.Value<bool>() == true)
-                .FirstOrDefault();
-            var channelAbout = aboutTab?["tabRenderer"]?["content"]?["sectionListRenderer"]?["contents"]?[0]?["itemSectionRenderer"]?["contents"]?[0]?["channelAboutFullMetadataRenderer"]?
-                .Value<JObject>();
-
-            var about = new Channel
+            var extractor = new ChannelPageExtractor(data);
+            var channel = new Channel
             {
-                Title = header?["title"]?.Value<string>() ?? "",
-                ChannelId = header?["channelId"]?.Value<string>() ?? "",
-                Thumbnails = header?["avatar"]?["thumbnails"]?
-                    .Values<JObject>()
-                    .Select(it => new Thumbnail
-                    {
-                        Url = it?["url"]?.Value<string>() ?? "",
-                        Width = it?["width"]?.Value<int>() ?? 0,
-                        Height = it?["height"]?.Value<int>() ?? 0
-                    })
-                    .ToList() ?? new List<Thumbnail>(),
-                Banners = header?["banner"]?["thumbnails"]?
-                    .Values<JObject>()
-                    .Select(it => new Thumbnail
-                    {
-                        Url = it?["url"]?.Value<string>() ?? "",
-                        Width = it?["width"]?.Value<int>() ?? 0,
-                        Height = it?["height"]?.Value<int>() ?? 0
-                    })
-                    .ToList() ?? new List<Thumbnail>(),
-                Description = channelAbout?["description"]?["simpleText"]?.Value<string>() ?? "",
-                CanonicalChannelUrl = channelAbout?["canonicalChannelUrl"]?.Value<string>() ?? "",
-                Country = channelAbout?["country"]?["simpleText"]?.Value<string>() ?? "",
-                SubscriberCount = header?["subscriberCountText"]?["simpleText"]?.Value<string>()?.GetCountValue() ?? 0,
-                ViewCount = channelAbout?["viewCountText"]?["simpleText"]?.Value<string>()?.GetCountValue() ?? 0,
-                JoinedDate = channelAbout?["joinedDateText"]?["runs"]?[1]?["text"]?.Value<string>()?.GetJoinedDate()
+                Title = extractor.GetTitle(),
+                ChannelId = extractor.GetChannelId(),
+                Description = extractor.GetDescription(),
+                CanonicalChannelUrl = extractor.GetCanonicalChannelUrl(),
+                Country = extractor.GetCountry(),
+                SubscriberCount = extractor.GetSubscriberCount(),
+                ViewCount = extractor.GetViewCount(),
+                JoinedDate = extractor.GetJoinedDate(),
+                Thumbnails = extractor.GetThumbnails(),
+                Banners = extractor.GetBanners(),
             };
-            return about;
+            return channel;
         }
-        // ----- GetAbout -----
+        // ----- GetChannel -----
 
         // ----- GetVideos -----
         private string? _continuation;
         private JToken? _context;
 
-        private ChannelVideo MapVideo(JToken? grid)
+        private ChannelVideo MapVideo(JToken grid)
         {
-            var duration = grid?["thumbnailOverlays"]?[0]?["thumbnailOverlayTimeStatusRenderer"]?["text"]?["simpleText"]?.Value<string>();
-            var publishedTime = grid?["publishedTimeText"]?["simpleText"]?.Value<string>();
-            var viewCount = grid?["viewCountText"]?["simpleText"]?.Value<string>()?.GetCountValue() ?? 0;
-            var liveViewCount = grid?["viewCountText"]?["runs"]?.FirstOrDefault()?["text"]?.Value<string>()?.GetCountValue() ?? 0;
-            var timeStyle = grid?["thumbnailOverlays"]?[0]?["thumbnailOverlayTimeStatusRenderer"]?["style"]?.Value<string>();
-            var isStream = publishedTime?.Contains("Streamed") ?? false;
-            var isLive = timeStyle == "LIVE";
-            var isShorts = duration == "SHORTS";
-
+            var extractor = new ChannelVideoExtractor(grid);
             return new ChannelVideo
             {
-                VideoId = grid?["videoId"]?.Value<string>() ?? "",
-                Title = grid?["title"]?["runs"]?[0]?["text"]?.Value<string>() ?? "",
-                Thumbnails = grid?["thumbnail"]?["thumbnails"]?
-                    .Values<JObject>()
-                    .Select(it => new Thumbnail
-                    {
-                        Url = it?["url"]?.Value<string>() ?? "",
-                        Width = it?["width"]?.Value<int>() ?? 0,
-                        Height = it?["height"]?.Value<int>() ?? 0
-                    })
-                    .ToList() ?? new List<Thumbnail>(),
-                RichThumbnails = grid?["richThumbnail"]?["movingThumbnailRenderer"]?["movingThumbnailDetails"]?["thumbnails"]?
-                    .Values<JObject>()
-                    .Select(it => new Thumbnail
-                    {
-                        Url = it?["url"]?.Value<string>() ?? "",
-                        Width = it?["width"]?.Value<int>() ?? 0,
-                        Height = it?["height"]?.Value<int>() ?? 0
-                    })
-                    .ToList() ?? new List<Thumbnail>(),
-                PublishedTime = publishedTime ?? "",
-                PublishedTimeSeconds = publishedTime?.GetPublishedTimeSeconds() ?? 0,
-                IsShorts = isShorts,
-                Duration = !isShorts ? duration?.GetDuration() : null,
-                IsLive = isLive,
-                IsStream = isLive || isStream,
-                ViewCount = isLive ? liveViewCount : viewCount
+                Title = extractor.GetTitle(),
+                VideoId = extractor.GetVideoId(),
+                Thumbnails = extractor.GetThumbnails(),
+                RichThumbnail = extractor.TryGetRichThumbnail(),
+                ViewCount = extractor.GetViewCount(),
+                Duration = extractor.TryGetDuration(),
+                PublishedTime = extractor.GetPublishedTime(),
+                PublishedTimeSeconds = extractor.GetPublishedTimeSeconds(),
+                VideoStatus = extractor.GetVideoStatus(),
+                VideoType = extractor.GetVideoType(),
+                IsShorts = extractor.IsShorts()
             };
         }
 
@@ -144,26 +97,17 @@ namespace YoutubeParser.Parser
                     .Substring(0, it.Length - 1)
                     .Replace("var ytInitialData = ", ""));
             var data = JsonConvert.DeserializeObject<JObject>(json);
-            var videoTab = data?["contents"]?["twoColumnBrowseResultsRenderer"]?["tabs"]?
-                .Values<JObject>()
-                .Where(it => it?["tabRenderer"]?["selected"]?.Value<bool>() == true)
-                .FirstOrDefault();
-            var videoGrids = videoTab?["tabRenderer"]?["content"]?["sectionListRenderer"]?["contents"]?[0]?["itemSectionRenderer"]?["contents"]?[0]?["gridRenderer"]?["items"]?
-                .Values<JObject>() ?? new List<JObject>();
-
+            var extractor = new ChannelVideoPageExtractor(data);
+            
             _continuation = null;
             var videos = new List<ChannelVideo>();
-            foreach (var videoGrid in videoGrids)
+            var videoItems = extractor.GetVideoItems();
+            foreach (var item in videoItems)
             {
-                if (videoGrid?.ContainsKey("gridVideoRenderer") == true)
-                {
-                    var grid = videoGrid["gridVideoRenderer"];
-                    var video = MapVideo(grid);
-                    videos.Add(video);
-                    continue;
-                }
-                _continuation = videoGrid?["continuationItemRenderer"]?["continuationEndpoint"]?["continuationCommand"]?["token"]?.Value<string>();
+                videos.Add(MapVideo(item));
             }
+            // must be after each GetVideoItems
+            _continuation = extractor.TryGetContinuation();
             var ytcfg = html
                 .Pipe(it => Regex.Match(it, @"ytcfg\.set\s*\(\s*({.+?})\s*\)\s*;"))
                 .Select(m => m.Groups[1].Value)
@@ -193,22 +137,17 @@ namespace YoutubeParser.Parser
             response.EnsureSuccessStatusCode();
             var json = await response.Content.ReadAsStringAsync();
             var data = JsonConvert.DeserializeObject<JObject>(json);
-            var videoGrids = data?["onResponseReceivedActions"]?[0]?["appendContinuationItemsAction"]?["continuationItems"]?
-                .Values<JObject>() ?? new List<JObject>();
-
+            var extractor = new ChannelVideoPageExtractor(data);
+            
             _continuation = null;
             var videos = new List<ChannelVideo>();
-            foreach (var videoGrid in videoGrids)
+            var videoItems = extractor.GetVideoItemsFromNext();
+            foreach (var item in videoItems)
             {
-                if (videoGrid?.ContainsKey("gridVideoRenderer") == true)
-                {
-                    var grid = videoGrid["gridVideoRenderer"];
-                    var video = MapVideo(grid);
-                    videos.Add(video);
-                    continue;
-                }
-                _continuation = videoGrid?["continuationItemRenderer"]?["continuationEndpoint"]?["continuationCommand"]?["token"]?.Value<string>();
+                videos.Add(MapVideo(item));
             }
+            // must be after each GetVideoItemsFromNext
+            _continuation = extractor.TryGetContinuation();
             return videos;
         }
 
