@@ -10,12 +10,12 @@ namespace YoutubeParser.Extensions
 {
     internal static class YoutubeExtractorExtension
     {
-        internal static bool GetIsStream(this string publishedTime)
+        public static bool GetIsStream(this string publishedTime)
         {
             return publishedTime.Contains("Streamed");
         }
 
-        internal static long GetCountValue(this string viewCount)
+        public static long GetCountValue(this string viewCount)
         {
             var val = viewCount
                 .Pipe(it => Regex.Match(it, @"([\d,]+)"))
@@ -29,7 +29,7 @@ namespace YoutubeParser.Extensions
             return (long)val;
         }
 
-        internal static TimeSpan? TryGetDuration(this string duration)
+        public static TimeSpan? TryGetDuration(this string duration)
         {
             var formats = new string[]
                 { @"m\:ss", @"mm\:ss", @"h\:mm\:ss", @"hh\:mm\:ss" };
@@ -38,14 +38,14 @@ namespace YoutubeParser.Extensions
                     ? result : null;
         }
 
-        internal static DateTime? TryGetJoinedDate(this string joinedDate)
+        public static DateTime? TryGetJoinedDate(this string joinedDate)
         {
             return DateTime.TryParse(joinedDate, DateTimeFormatInfo.InvariantInfo, 
                 DateTimeStyles.None, out var result)
                     ? result : null;
         }
-        
-        internal static long GetPublishedTimeSeconds(this string publishedTime)
+
+        public static long GetPublishedTimeSeconds(this string publishedTime)
         {
             var val = publishedTime
                 .Pipe(it => Regex.Match(it, @"(\d+)"))

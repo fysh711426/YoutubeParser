@@ -7,56 +7,15 @@ using System.Net.Http;
 using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
-using YoutubeParser.Channels;
+using YoutubeParser.ChannelVideos;
 using YoutubeParser.Extensions;
 using YoutubeParser.Models;
 using YoutubeParser.Utils;
 
-namespace YoutubeParser.Parser
+namespace YoutubeParser.Channels
 {
-    public class YoutubeChannelParser : YoutubeParserBase
+    public partial class YoutubeChannelParser
     {
-        public YoutubeChannelParser(HttpClient httpClient)
-            : base(httpClient)
-        {
-        }
-
-        // ----- GetChannel -----
-        public async Task<Channel> GetAsync(string urlOrChannelId)
-        {
-            var url = $"{GetChannelUrl(urlOrChannelId)}/about";
-            using var request = new HttpRequestMessage(HttpMethod.Get, url);
-            request.Headers.Add("Cookie", $"PREF=hl={hl}");
-            using var response = await _httpClient.SendAsync(request, HttpCompletionOption.ResponseHeadersRead);
-            response.EnsureSuccessStatusCode();
-            var html = await response.Content.ReadAsStringAsync();
-            var json = html
-                .Pipe(it => Regex.Matches(it, @"<script.*?>([\s\S]*?)<\/script>"))
-                .SelectMany(it => it.Groups[1].Value)
-                .Where(it => it.Contains("ytInitialData"))
-                .First()
-                .Pipe(it => it
-                    .Substring(0, it.Length - 1)
-                    .Replace("var ytInitialData = ", ""));
-            var data = JsonConvert.DeserializeObject<JObject>(json);
-            var extractor = new ChannelPageExtractor(data);
-            var channel = new Channel
-            {
-                Title = extractor.GetTitle(),
-                ChannelId = extractor.GetChannelId(),
-                Description = extractor.GetDescription(),
-                CanonicalChannelUrl = extractor.GetCanonicalChannelUrl(),
-                Country = extractor.GetCountry(),
-                SubscriberCount = extractor.GetSubscriberCount(),
-                ViewCount = extractor.GetViewCount(),
-                JoinedDate = extractor.GetJoinedDate(),
-                Thumbnails = extractor.GetThumbnails(),
-                Banners = extractor.GetBanners(),
-            };
-            return channel;
-        }
-        // ----- GetChannel -----
-
         // ----- GetVideos -----
         private string? _continuation;
         private JToken? _context;
@@ -98,7 +57,7 @@ namespace YoutubeParser.Parser
                     .Replace("var ytInitialData = ", ""));
             var data = JsonConvert.DeserializeObject<JObject>(json);
             var extractor = new ChannelVideoPageExtractor(data);
-            
+
             _continuation = null;
             var videos = new List<ChannelVideo>();
             var videoItems = extractor.GetVideoItems();
@@ -138,7 +97,7 @@ namespace YoutubeParser.Parser
             var json = await response.Content.ReadAsStringAsync();
             var data = JsonConvert.DeserializeObject<JObject>(json);
             var extractor = new ChannelVideoPageExtractor(data);
-            
+
             _continuation = null;
             var videos = new List<ChannelVideo>();
             var videoItems = extractor.GetVideoItemsFromNext();

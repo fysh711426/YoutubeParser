@@ -6,7 +6,7 @@ using System.Text;
 using System.Threading.Tasks;
 using YoutubeParser.Utils;
 
-namespace YoutubeParser.Channels
+namespace YoutubeParser.ChannelVideos
 {
     internal class ChannelVideoPageExtractor
     {

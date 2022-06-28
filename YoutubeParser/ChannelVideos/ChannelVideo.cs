@@ -6,7 +6,7 @@ using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using YoutubeParser.Models;
 
-namespace YoutubeParser.Channels
+namespace YoutubeParser.ChannelVideos
 {
     public enum VideoType
     {
@@ -29,7 +29,7 @@ namespace YoutubeParser.Channels
         public VideoStatus VideoStatus { get; set; }
         public bool IsShorts { get; set; }
         public TimeSpan? Duration { get; set; }
-        public List<Thumbnail> Thumbnails { get; set; } = new List<Thumbnail>();
+        public List<Thumbnail> Thumbnails { get; set; } = new();
         public Thumbnail? RichThumbnail { get; set; }
         public long ViewCount { get; set; }
         public string PublishedTime { get; set; } = "";

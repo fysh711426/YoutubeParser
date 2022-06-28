@@ -8,14 +8,14 @@ using YoutubeParser.Extensions;
 using YoutubeParser.Models;
 using YoutubeParser.Utils;
 
-namespace YoutubeParser.Channels
+namespace YoutubeParser.ChannelVideos
 {
     internal class ChannelVideoExtractor
     {
         private readonly JToken _content;
 
         public ChannelVideoExtractor(JToken content) => _content = content;
-        
+
         private JToken? TryGetThumbnailOverlayTimeStatus() => Memo.Cache(this, () =>
             _content["thumbnailOverlays"]?.FirstOrDefault()?["thumbnailOverlayTimeStatusRenderer"]
         );
@@ -69,7 +69,7 @@ namespace YoutubeParser.Channels
         );
 
         public long GetViewCount() => Memo.Cache(this, () =>
-            TryGetViewCountText()?.GetCountValue() ?? 
+            TryGetViewCountText()?.GetCountValue() ??
             TryGetLiveViewCountText()?.GetCountValue() ?? 0
         );
 

@@ -12,8 +12,8 @@ namespace YoutubeParser.Channels
     {
         public string Title { get; set; } = "";
         public string ChannelId { get; set; } = "";
-        public List<Thumbnail> Thumbnails { get; set; } = new List<Thumbnail>();
-        public List<Thumbnail> Banners { get; set; } = new List<Thumbnail>();
+        public List<Thumbnail> Thumbnails { get; set; } = new();
+        public List<Thumbnail> Banners { get; set; } = new();
         public string Description { get; set; } = "";
         public DateTime? JoinedDate { get; set; }
         public string Country { get; set; } = "";
