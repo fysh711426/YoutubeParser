@@ -25,7 +25,7 @@ namespace YoutubeParser.Channels
         {
             var url = $"{GetChannelUrl(urlOrChannelId)}/about";
             using var request = new HttpRequestMessage(HttpMethod.Get, url);
-            request.Headers.Add("Cookie", $"PREF=hl={hl}");
+            SetDefaultHttpRequest(request);
             using var response = await _httpClient.SendAsync(request, HttpCompletionOption.ResponseHeadersRead);
             response.EnsureSuccessStatusCode();
             var html = await response.Content.ReadAsStringAsync();

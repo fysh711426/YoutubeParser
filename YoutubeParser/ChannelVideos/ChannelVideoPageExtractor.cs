@@ -14,18 +14,8 @@ namespace YoutubeParser.ChannelVideos
 
         public ChannelVideoPageExtractor(JObject? content) => _content = content;
 
-        private JToken? TryGetTabs() => Memo.Cache(this, () =>
-            _content?["contents"]?["twoColumnBrowseResultsRenderer"]?["tabs"]
-        );
-
-        private JObject? TryGetSelectedTab() => Memo.Cache(this, () =>
-            TryGetTabs()?.Values<JObject>()
-                .Where(it => it?["tabRenderer"]?["selected"]?.Value<bool>() == true)
-                .FirstOrDefault()
-        );
-
         private IEnumerable<JObject?> GetVideoGrids() => Memo.Cache(this, () =>
-            TryGetSelectedTab()?["tabRenderer"]?["content"]?["sectionListRenderer"]?["contents"]?
+            _content?["tabRenderer"]?["content"]?["sectionListRenderer"]?["contents"]?
                 .FirstOrDefault()?["itemSectionRenderer"]?["contents"]?
                 .FirstOrDefault()?["gridRenderer"]?["items"]?
                 .Values<JObject>() ?? new List<JObject>()

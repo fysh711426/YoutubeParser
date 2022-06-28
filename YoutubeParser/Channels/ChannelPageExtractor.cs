@@ -24,7 +24,7 @@ namespace YoutubeParser.Channels
             _content?["contents"]?["twoColumnBrowseResultsRenderer"]?["tabs"]
         );
 
-        private JObject? TryGetSelectedTab() => Memo.Cache(this, () =>
+        public JObject? TryGetSelectedTab() => Memo.Cache(this, () =>
             TryGetTabs()?.Values<JObject>()
                 .Where(it => it?["tabRenderer"]?["selected"]?.Value<bool>() == true)
                 .FirstOrDefault()

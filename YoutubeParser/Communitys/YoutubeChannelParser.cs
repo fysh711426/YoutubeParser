@@ -16,32 +16,32 @@ namespace YoutubeParser.Channels
 {
     public partial class YoutubeChannelParser
     {
-        // ----- GetVideos -----
-        private string? _continuation;
-        private JToken? _context;
+        // ----- GetCommunitys -----
+        private string? _continuationCommunity;
+        private JToken? _contextCommunity;
 
-        private ChannelVideo MapVideo(JToken grid)
+        private Community MapCommunity(JToken content)
         {
-            var extractor = new ChannelVideoExtractor(grid);
-            return new ChannelVideo
+            var extractor = new CommunityExtractor(content);
+            return new Community
             {
-                Title = extractor.GetTitle(),
-                VideoId = extractor.GetVideoId(),
-                Thumbnails = extractor.GetThumbnails(),
-                RichThumbnail = extractor.TryGetRichThumbnail(),
-                ViewCount = extractor.GetViewCount(),
-                Duration = extractor.TryGetDuration(),
+                PostId = extractor.GetPostId(),
+                AuthorName = extractor.GetAuthorName(),
+                AuthorChannelId = extractor.GetAuthorChannelId(),
+                AuthorThumbnails = extractor.GetAuthorThumbnails(),
+                Content = extractor.GetContent(),
+                Images = extractor.GetImages(),
                 PublishedTime = extractor.GetPublishedTime(),
                 PublishedTimeSeconds = extractor.GetPublishedTimeSeconds(),
-                VideoStatus = extractor.GetVideoStatus(),
-                VideoType = extractor.GetVideoType(),
-                IsShorts = extractor.IsShorts()
+                LikeCount = extractor.GetLikeCount(),
+                VoteStatus = extractor.GetVoteStatus(),
+                PollStatus = extractor.GetPollStatus()
             };
         }
 
-        public async Task<List<ChannelVideo>> GetVideosListAsync(string urlOrChannelId)
+        public async Task<List<Community>> GetCommunitysListAsync(string urlOrChannelId)
         {
-            var url = $"{GetChannelUrl(urlOrChannelId)}/videos";
+            var url = $"{GetChannelUrl(urlOrChannelId)}/community";
             using var request = new HttpRequestMessage(HttpMethod.Get, url);
             SetDefaultHttpRequest(request);
             using var response = await _httpClient.SendAsync(request, HttpCompletionOption.ResponseHeadersRead);
@@ -58,27 +58,27 @@ namespace YoutubeParser.Channels
             var data = JsonConvert.DeserializeObject<JObject>(json);
             var extractor = data
                 .Pipe(it => new ChannelPageExtractor(it))
-                .Pipe(it => new ChannelVideoPageExtractor(it.TryGetSelectedTab()));
-            
-            var videos = new List<ChannelVideo>();
-            var videoItems = extractor.GetVideoItems();
-            foreach (var item in videoItems)
+                .Pipe(it => new CommunityPageExtractor(it.TryGetSelectedTab()));
+
+            var communitys = new List<Community>();
+            var communityItems = extractor.GetCommunityItems();
+            foreach (var item in communityItems)
             {
-                videos.Add(MapVideo(item));
+                communitys.Add(MapCommunity(item));
             }
             // must be after each GetVideoItems
-            _continuation = extractor.TryGetContinuation();
+            _continuationCommunity = extractor.TryGetContinuation();
             var ytcfg = html
                 .Pipe(it => Regex.Match(it, @"ytcfg\.set\s*\(\s*({.+?})\s*\)\s*;"))
                 .Select(m => m.Groups[1].Value)
                 .Pipe(it => JsonConvert.DeserializeObject<JObject>(it));
-            _context = ytcfg?["INNERTUBE_CONTEXT"];
-            return videos;
+            _contextCommunity = ytcfg?["INNERTUBE_CONTEXT"];
+            return communitys;
         }
 
-        public async Task<List<ChannelVideo>?> GetNextVideosListAsync()
+        public async Task<List<Community>?> GetNextCommunitysListAsync()
         {
-            if (_continuation == null)
+            if (_continuationCommunity == null)
                 return null;
 
             var apiUrl = $"https://www.youtube.com/youtubei/v1/browse?key={apiKey}";
@@ -87,8 +87,8 @@ namespace YoutubeParser.Channels
             using var request = new HttpRequestMessage(HttpMethod.Post, apiUrl);
             var payload = new
             {
-                context = _context,
-                continuation = _continuation
+                context = _contextCommunity,
+                continuation = _continuationCommunity
             };
             var content = new StringContent(
                 JsonConvert.SerializeObject(payload), Encoding.UTF8, "application/json");
@@ -97,39 +97,39 @@ namespace YoutubeParser.Channels
             response.EnsureSuccessStatusCode();
             var json = await response.Content.ReadAsStringAsync();
             var data = JsonConvert.DeserializeObject<JObject>(json);
-            var extractor = new ChannelVideoPageExtractor(data);
+            var extractor = new CommunityPageExtractor(data);
 
-            var videos = new List<ChannelVideo>();
-            var videoItems = extractor.GetVideoItemsFromNext();
-            foreach (var item in videoItems)
+            var communitys = new List<Community>();
+            var communityItems = extractor.GetCommunityItemsFromNext();
+            foreach (var item in communityItems)
             {
-                videos.Add(MapVideo(item));
+                communitys.Add(MapCommunity(item));
             }
-            // must be after each GetVideoItemsFromNext
-            _continuation = extractor.TryGetContinuation();
-            return videos;
+            // must be after each GetCommunityItemsFromNext
+            _continuationCommunity = extractor.TryGetContinuation();
+            return communitys;
         }
 
 #if (!NET45 && !NET46)
-        public async IAsyncEnumerable<ChannelVideo> GetVideosAsync(string urlOrChannelId)
+        public async IAsyncEnumerable<Community> GetCommunitysAsync(string urlOrChannelId)
         {
-            var videos = await GetVideosListAsync(urlOrChannelId);
-            foreach (var item in videos)
+            var communitys = await GetCommunitysListAsync(urlOrChannelId);
+            foreach (var item in communitys)
             {
                 yield return item;
             }
             while (true)
             {
-                var nextVideos = await GetNextVideosListAsync();
-                if (nextVideos == null)
+                var nextCommunitys = await GetNextCommunitysListAsync();
+                if (nextCommunitys == null)
                     break;
-                foreach (var item in nextVideos)
+                foreach (var item in nextCommunitys)
                 {
                     yield return item;
                 }
             }
         }
 #endif
-        // ----- GetVideos -----
+        // ----- GetCommunitys -----
     }
 }
