@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
-using YoutubeParser.Models;
+using YoutubeParser.Commons;
 
 namespace YoutubeParser.Channels
 {
@@ -12,8 +12,8 @@ namespace YoutubeParser.Channels
     {
         public string Title { get; set; } = "";
         public string ChannelId { get; set; } = "";
-        public List<Thumbnail> Thumbnails { get; set; } = new();
-        public List<Thumbnail> Banners { get; set; } = new();
+        public IReadOnlyList<Thumbnail> Thumbnails { get; set; } = new List<Thumbnail>();
+        public IReadOnlyList<Thumbnail> Banners { get; set; } = new List<Thumbnail>();
         public string Description { get; set; } = "";
         public DateTime? JoinedDate { get; set; }
         public string Country { get; set; } = "";

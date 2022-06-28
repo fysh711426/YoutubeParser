@@ -8,8 +8,8 @@ using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using YoutubeParser.ChannelVideos;
+using YoutubeParser.Commons;
 using YoutubeParser.Extensions;
-using YoutubeParser.Models;
 using YoutubeParser.Utils;
 
 namespace YoutubeParser.Channels
@@ -47,18 +47,9 @@ namespace YoutubeParser.Channels
             using var response = await _httpClient.SendAsync(request, HttpCompletionOption.ResponseHeadersRead);
             response.EnsureSuccessStatusCode();
             var html = await response.Content.ReadAsStringAsync();
-            var json = html
-                .Pipe(it => Regex.Matches(it, @"<script.*?>([\s\S]*?)<\/script>"))
-                .SelectMany(m => m.Groups[1].Value)
-                .Where(it => it.Contains("ytInitialData"))
-                .First()
-                .Pipe(it => it
-                    .Substring(0, it.Length - 1)
-                    .Replace("var ytInitialData = ", ""));
-            var data = JsonConvert.DeserializeObject<JObject>(json);
-            var extractor = data
-                .Pipe(it => new ChannelPageExtractor(it))
-                .Pipe(it => new ChannelVideoPageExtractor(it.TryGetSelectedTab()));
+            var extractor = html
+                .Pipe(it => new YoutubePageExtractor(it))
+                .Pipe(it => new ChannelVideoPageExtractor(it.TryGetInitialData()));
             
             var videos = new List<ChannelVideo>();
             var videoItems = extractor.GetVideoItems();
@@ -96,8 +87,9 @@ namespace YoutubeParser.Channels
             using var response = await client.SendAsync(request, HttpCompletionOption.ResponseHeadersRead);
             response.EnsureSuccessStatusCode();
             var json = await response.Content.ReadAsStringAsync();
-            var data = JsonConvert.DeserializeObject<JObject>(json);
-            var extractor = new ChannelVideoPageExtractor(data);
+            var extractor = json
+                .Pipe(it => JsonConvert.DeserializeObject<JObject>(it))
+                .Pipe(it => new ChannelVideoPageExtractor(it));
 
             var videos = new List<ChannelVideo>();
             var videoItems = extractor.GetVideoItemsFromNext();

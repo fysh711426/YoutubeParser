@@ -7,8 +7,8 @@ using System.Net.Http;
 using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
+using YoutubeParser.Commons;
 using YoutubeParser.Extensions;
-using YoutubeParser.Models;
 using YoutubeParser.Utils;
 
 namespace YoutubeParser.Channels
@@ -29,16 +29,10 @@ namespace YoutubeParser.Channels
             using var response = await _httpClient.SendAsync(request, HttpCompletionOption.ResponseHeadersRead);
             response.EnsureSuccessStatusCode();
             var html = await response.Content.ReadAsStringAsync();
-            var json = html
-                .Pipe(it => Regex.Matches(it, @"<script.*?>([\s\S]*?)<\/script>"))
-                .SelectMany(it => it.Groups[1].Value)
-                .Where(it => it.Contains("ytInitialData"))
-                .First()
-                .Pipe(it => it
-                    .Substring(0, it.Length - 1)
-                    .Replace("var ytInitialData = ", ""));
-            var data = JsonConvert.DeserializeObject<JObject>(json);
-            var extractor = new ChannelPageExtractor(data);
+            var extractor = html
+                .Pipe(it => new YoutubePageExtractor(html))
+                .Pipe(it => new ChannelPageExtractor(it.TryGetInitialData()));
+
             var channel = new Channel
             {
                 Title = extractor.GetTitle(),

@@ -4,23 +4,10 @@ using System.Linq;
 using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
-using YoutubeParser.Models;
+using YoutubeParser.Commons;
 
 namespace YoutubeParser.ChannelVideos
 {
-    public enum VideoType
-    {
-        Video,
-        Stream
-    }
-
-    public enum VideoStatus
-    {
-        Default,
-        Live,
-        Upcoming
-    }
-
     public class ChannelVideo
     {
         public string VideoId { get; set; } = "";
@@ -29,7 +16,7 @@ namespace YoutubeParser.ChannelVideos
         public VideoStatus VideoStatus { get; set; }
         public bool IsShorts { get; set; }
         public TimeSpan? Duration { get; set; }
-        public List<Thumbnail> Thumbnails { get; set; } = new();
+        public IReadOnlyList<Thumbnail> Thumbnails { get; set; } = new List<Thumbnail>();
         public Thumbnail? RichThumbnail { get; set; }
         public long ViewCount { get; set; }
         public string PublishedTime { get; set; } = "";

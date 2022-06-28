@@ -4,8 +4,8 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using YoutubeParser.Commons;
 using YoutubeParser.Extensions;
-using YoutubeParser.Models;
 using YoutubeParser.Utils;
 
 namespace YoutubeParser.Channels
@@ -69,24 +69,17 @@ namespace YoutubeParser.Channels
             TryGetAbout()?["joinedDateText"]?["runs"]?.LastOrDefault()?["text"]?.Value<string>()?.TryGetJoinedDate() ?? default(DateTime)
         );
 
-        private Thumbnail GetThumbnail(JObject? data) => new Thumbnail
-        {
-            Url = data?["url"]?.Value<string>() ?? "",
-            Width = data?["width"]?.Value<int>() ?? 0,
-            Height = data?["height"]?.Value<int>() ?? 0
-        };
-
         public List<Thumbnail> GetThumbnails() => Memo.Cache(this, () =>
             TryGetHeader()?["avatar"]?["thumbnails"]?
                 .Values<JObject>()
-                .Select(it => GetThumbnail(it))
+                .Select(it => new ThumbnailExtractor(it).GetThumbnail())
                 .ToList() ?? new List<Thumbnail>()
         );
 
         public List<Thumbnail> GetBanners() => Memo.Cache(this, () =>
             TryGetHeader()?["banner"]?["thumbnails"]?
                 .Values<JObject>()
-                .Select(it => GetThumbnail(it))
+                .Select(it => new ThumbnailExtractor(it).GetThumbnail())
                 .ToList() ?? new List<Thumbnail>()
         );
     }

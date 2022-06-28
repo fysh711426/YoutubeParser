@@ -4,8 +4,8 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using YoutubeParser.Commons;
 using YoutubeParser.Extensions;
-using YoutubeParser.Models;
 using YoutubeParser.Utils;
 
 namespace YoutubeParser.ChannelVideos
@@ -20,7 +20,7 @@ namespace YoutubeParser.ChannelVideos
             _content["postId"]?.Value<string>() ?? ""
         );
 
-        public string GetAuthorName() => Memo.Cache(this, () =>
+        public string GetAuthorTitle() => Memo.Cache(this, () =>
             _content["authorText"]?["runs"]?.FirstOrDefault()?["text"]?.Value<string>() ?? ""
         );
 
@@ -60,13 +60,6 @@ namespace YoutubeParser.ChannelVideos
             TryGetPublishedTime()?.GetPublishedTimeSeconds() ?? 0
         );
 
-        private Thumbnail GetThumbnail(JObject? data) => new Thumbnail
-        {
-            Url = data?["url"]?.Value<string>() ?? "",
-            Width = data?["width"]?.Value<int>() ?? 0,
-            Height = data?["height"]?.Value<int>() ?? 0
-        };
-
         private Thumbnail AddScheme(Thumbnail thumbnail)
         {
             thumbnail.Url = $"https:{thumbnail.Url}";
@@ -76,7 +69,7 @@ namespace YoutubeParser.ChannelVideos
         public List<Thumbnail> GetAuthorThumbnails() => Memo.Cache(this, () =>
             _content["authorThumbnail"]?["thumbnails"]?
                 .Values<JObject>()
-                .Select(it => GetThumbnail(it))
+                .Select(it => new ThumbnailExtractor(it).GetThumbnail())
                 .Select(it => AddScheme(it))
                 .ToList() ?? new List<Thumbnail>()
         );
@@ -84,7 +77,7 @@ namespace YoutubeParser.ChannelVideos
         public List<Thumbnail> GetImages() => Memo.Cache(this, () =>
             _content["backstageAttachment"]?["backstageImageRenderer"]?["image"]?["thumbnails"]?
                 .Values<JObject>()
-                .Select(it => GetThumbnail(it))
+                .Select(it => new ThumbnailExtractor(it).GetThumbnail())
                 .ToList() ?? new List<Thumbnail>()
         );
     }

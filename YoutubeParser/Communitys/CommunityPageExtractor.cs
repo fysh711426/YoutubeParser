@@ -13,9 +13,19 @@ namespace YoutubeParser.ChannelVideos
         private readonly JObject? _content;
 
         public CommunityPageExtractor(JObject? content) => _content = content;
+        
+        private JToken? TryGetTabs() => Memo.Cache(this, () =>
+            _content?["contents"]?["twoColumnBrowseResultsRenderer"]?["tabs"]
+        );
+
+        public JObject? TryGetSelectedTab() => Memo.Cache(this, () =>
+            TryGetTabs()?.Values<JObject>()
+                .Where(it => it?["tabRenderer"]?["selected"]?.Value<bool>() == true)
+                .FirstOrDefault()
+        );
 
         private IEnumerable<JObject?> GetCommunityContents() => Memo.Cache(this, () =>
-            _content?["tabRenderer"]?["content"]?["sectionListRenderer"]?["contents"]?
+            TryGetSelectedTab()?["tabRenderer"]?["content"]?["sectionListRenderer"]?["contents"]?
                 .FirstOrDefault()?["itemSectionRenderer"]?["contents"]?
                 .Values<JObject>() ?? new List<JObject>()
         );
