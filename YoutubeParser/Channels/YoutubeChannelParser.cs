@@ -29,9 +29,7 @@ namespace YoutubeParser.Channels
             using var response = await _httpClient.SendAsync(request, HttpCompletionOption.ResponseHeadersRead);
             response.EnsureSuccessStatusCode();
             var html = await response.Content.ReadAsStringAsync();
-            var extractor = html
-                .Pipe(it => new YoutubePageExtractor(html))
-                .Pipe(it => new ChannelPageExtractor(it.TryGetInitialData()));
+            var extractor = new ChannelPageExtractor(html);
 
             var channel = new Channel
             {

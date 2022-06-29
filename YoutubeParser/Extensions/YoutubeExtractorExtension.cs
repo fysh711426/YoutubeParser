@@ -45,6 +45,13 @@ namespace YoutubeParser.Extensions
                     ? result : null;
         }
 
+        public static DateTime? TryGetUploadDate(this string joinedDate)
+        {
+            return DateTime.TryParse(joinedDate, DateTimeFormatInfo.InvariantInfo,
+                DateTimeStyles.None, out var result)
+                    ? result : null;
+        }
+
         public static long GetPublishedTimeSeconds(this string publishedTime)
         {
             var val = publishedTime

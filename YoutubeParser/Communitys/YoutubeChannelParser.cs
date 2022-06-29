@@ -47,9 +47,7 @@ namespace YoutubeParser.Channels
             using var response = await _httpClient.SendAsync(request, HttpCompletionOption.ResponseHeadersRead);
             response.EnsureSuccessStatusCode();
             var html = await response.Content.ReadAsStringAsync();
-            var extractor = html
-                .Pipe(it => new YoutubePageExtractor(it))
-                .Pipe(it => new CommunityPageExtractor(it.TryGetInitialData()));
+            var extractor = new CommunityPageExtractor(html);
 
             var communitys = new List<Community>();
             var communityItems = extractor.GetCommunityItems();
@@ -87,9 +85,7 @@ namespace YoutubeParser.Channels
             using var response = await client.SendAsync(request, HttpCompletionOption.ResponseHeadersRead);
             response.EnsureSuccessStatusCode();
             var json = await response.Content.ReadAsStringAsync();
-            var extractor = json
-                .Pipe(it => JsonConvert.DeserializeObject<JObject>(it))
-                .Pipe(it => new CommunityPageExtractor(it));
+            var extractor = new CommunityPageExtractor(json);
 
             var communitys = new List<Community>();
             var communityItems = extractor.GetCommunityItemsFromNext();

@@ -4,24 +4,19 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using YoutubeParser.Commons;
 using YoutubeParser.Utils;
 
 namespace YoutubeParser.ChannelVideos
 {
     internal class CommunityPageExtractor
     {
-        private readonly JObject? _content;
+        private readonly string? _html;
 
-        public CommunityPageExtractor(JObject? content) => _content = content;
-        
-        private JToken? TryGetTabs() => Memo.Cache(this, () =>
-            _content?["contents"]?["twoColumnBrowseResultsRenderer"]?["tabs"]
-        );
+        public CommunityPageExtractor(string? html) => _html = html;
 
         public JObject? TryGetSelectedTab() => Memo.Cache(this, () =>
-            TryGetTabs()?.Values<JObject>()
-                .Where(it => it?["tabRenderer"]?["selected"]?.Value<bool>() == true)
-                .FirstOrDefault()
+            new YoutubePageExtractor(_html).TryGetSelectedTab()
         );
 
         private IEnumerable<JObject?> GetCommunityContents() => Memo.Cache(this, () =>
@@ -56,10 +51,12 @@ namespace YoutubeParser.ChannelVideos
 
         // For GetNextCommunitysList
         private IEnumerable<JObject?> GetCommunityContentsFromNext() => Memo.Cache(this, () =>
-            _content?["onResponseReceivedEndpoints"]?
-                .FirstOrDefault()?["appendContinuationItemsAction"]?["continuationItems"]?
-                .Values<JObject>() ?? new List<JObject>()
+            new YoutubePageExtractor(_html)
+                .TryGetJsonResponse()?["onResponseReceivedEndpoints"]?
+                    .FirstOrDefault()?["appendContinuationItemsAction"]?["continuationItems"]?
+                        .Values<JObject>() ?? new List<JObject>()
         );
+
         public IEnumerable<JToken> GetCommunityItemsFromNext()
         {
             var contents = GetCommunityContentsFromNext();

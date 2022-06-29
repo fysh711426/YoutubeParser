@@ -47,9 +47,7 @@ namespace YoutubeParser.Channels
             using var response = await _httpClient.SendAsync(request, HttpCompletionOption.ResponseHeadersRead);
             response.EnsureSuccessStatusCode();
             var html = await response.Content.ReadAsStringAsync();
-            var extractor = html
-                .Pipe(it => new YoutubePageExtractor(it))
-                .Pipe(it => new ChannelVideoPageExtractor(it.TryGetInitialData()));
+            var extractor = new ChannelVideoPageExtractor(html);
             
             var videos = new List<ChannelVideo>();
             var videoItems = extractor.GetVideoItems();
@@ -87,9 +85,7 @@ namespace YoutubeParser.Channels
             using var response = await client.SendAsync(request, HttpCompletionOption.ResponseHeadersRead);
             response.EnsureSuccessStatusCode();
             var json = await response.Content.ReadAsStringAsync();
-            var extractor = json
-                .Pipe(it => JsonConvert.DeserializeObject<JObject>(it))
-                .Pipe(it => new ChannelVideoPageExtractor(it));
+            var extractor = new ChannelVideoPageExtractor(json);
 
             var videos = new List<ChannelVideo>();
             var videoItems = extractor.GetVideoItemsFromNext();
@@ -122,6 +118,27 @@ namespace YoutubeParser.Channels
             }
         }
 #endif
+
+        public async Task<List<ChannelVideo>> GetUpcomingLiveStreamsAsync(string urlOrChannelId)
+        {
+            var url = $"{GetChannelUrl(urlOrChannelId)}/videos?view=2&live_view=502";
+            using var request = new HttpRequestMessage(HttpMethod.Get, url);
+            SetDefaultHttpRequest(request);
+            using var response = await _httpClient.SendAsync(request, HttpCompletionOption.ResponseHeadersRead);
+            response.EnsureSuccessStatusCode();
+            var html = await response.Content.ReadAsStringAsync();
+            var extractor = new ChannelVideoPageExtractor(html);
+
+            var videos = new List<ChannelVideo>();
+            var videoItems = extractor.GetUpcomingLiveStreamItems();
+            foreach (var item in videoItems)
+            {
+                var video = MapVideo(item);
+                video.VideoType = VideoType.Stream;
+                videos.Add(video);
+            }
+            return videos;
+        }
         // ----- GetVideos -----
     }
 }

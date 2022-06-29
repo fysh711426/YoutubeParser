@@ -6,13 +6,14 @@ using System.Text;
 using System.Threading.Tasks;
 using YoutubeParser.Channels;
 using YoutubeParser.Utils;
+using YoutubeParser.Videos;
 
 namespace YoutubeParser
 {
     public class YoutubeClient
     {
         public YoutubeChannelParser Channel { get; set; }
-        //public YoutubeVideoParser? Video { get; set; }
+        public YoutubeVideoParser Video { get; set; }
         public YoutubeClient() : 
             this(Http.Client)
         {
@@ -20,7 +21,7 @@ namespace YoutubeParser
         public YoutubeClient(HttpClient httpClient)
         {
             Channel = new YoutubeChannelParser(httpClient);
-            //Video = new YoutubeVideoParser(httpClient);
+            Video = new YoutubeVideoParser(httpClient);
         }
     }
 }

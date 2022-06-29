@@ -41,7 +41,11 @@ namespace YoutubeParser.ChannelVideos
         );
 
         private bool IsStream() => Memo.Cache(this, () =>
-            TryGetPublishedTime()?.Contains("Streamed") ?? false
+            IsLive() || GetPublishedTime().ToLower().Contains("stream")
+        );
+
+        private bool IsUpcoming() => Memo.Cache(this, () =>
+            TryGetThumbnailOverlayTimeStatus()?["style"]?.Value<string>() == "UPCOMING"
         );
 
         public bool IsShorts() => Memo.Cache(this, () =>
@@ -74,11 +78,12 @@ namespace YoutubeParser.ChannelVideos
         );
 
         public VideoType GetVideoType() => Memo.Cache(this, () =>
-            IsLive() || IsStream() ? VideoType.Stream : VideoType.Video
+            IsStream() ? VideoType.Stream : VideoType.Video
         );
 
         public VideoStatus GetVideoStatus() => Memo.Cache(this, () =>
-           IsLive() ? VideoStatus.Live : VideoStatus.Default
+            IsUpcoming() ? VideoStatus.Upcoming :
+                IsLive() ? VideoStatus.Live : VideoStatus.Default
         );
 
         private Thumbnail GetThumbnail(JObject? data) => new Thumbnail

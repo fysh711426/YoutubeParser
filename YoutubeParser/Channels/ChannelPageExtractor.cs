@@ -12,16 +12,20 @@ namespace YoutubeParser.Channels
 {
     internal class ChannelPageExtractor
     {
-        private readonly JObject? _content;
+        private readonly string? _html;
 
-        public ChannelPageExtractor(JObject? content) => _content = content;
+        public ChannelPageExtractor(string? html) => _html = html;
+
+        public JObject? TryGetInitialData() => Memo.Cache(this, () =>
+            new YoutubePageExtractor(_html).TryGetInitialData()
+        );
 
         private JToken? TryGetHeader() => Memo.Cache(this, () =>
-            _content?["header"]?["c4TabbedHeaderRenderer"]
+            TryGetInitialData()?["header"]?["c4TabbedHeaderRenderer"]
         );
 
         private JToken? TryGetTabs() => Memo.Cache(this, () =>
-            _content?["contents"]?["twoColumnBrowseResultsRenderer"]?["tabs"]
+            TryGetInitialData()?["contents"]?["twoColumnBrowseResultsRenderer"]?["tabs"]
         );
 
         public JObject? TryGetSelectedTab() => Memo.Cache(this, () =>
