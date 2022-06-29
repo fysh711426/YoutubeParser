@@ -5,7 +5,9 @@ VisualStudioVersion = 17.2.32602.215
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "YoutubeParser", "YoutubeParser.csproj", "{23A4CAA8-CB19-4052-BA9B-9A3F8321E57A}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Example", "..\Example\Example.csproj", "{3748D77E-C0D2-4E2B-9835-824F91B79B71}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Example", "..\Example\Example.csproj", "{3748D77E-C0D2-4E2B-9835-824F91B79B71}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "YoutubeParser.Test", "..\YoutubeParser.Test\YoutubeParser.Test.csproj", "{DF5509CE-5778-4416-8970-7D0F91FE25CD}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -21,6 +23,10 @@ Global
 		{3748D77E-C0D2-4E2B-9835-824F91B79B71}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{3748D77E-C0D2-4E2B-9835-824F91B79B71}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{3748D77E-C0D2-4E2B-9835-824F91B79B71}.Release|Any CPU.Build.0 = Release|Any CPU
+		{DF5509CE-5778-4416-8970-7D0F91FE25CD}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{DF5509CE-5778-4416-8970-7D0F91FE25CD}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{DF5509CE-5778-4416-8970-7D0F91FE25CD}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{DF5509CE-5778-4416-8970-7D0F91FE25CD}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

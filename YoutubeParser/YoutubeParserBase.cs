@@ -21,10 +21,6 @@ namespace YoutubeParser
         public YoutubeParserBase(HttpClient httpClient)
         {
             _httpClient = httpClient;
-            if (_httpClient.DefaultRequestHeaders.ConnectionClose == null)
-                _httpClient.DefaultRequestHeaders.ConnectionClose = true;
-            if (!_httpClient.DefaultRequestHeaders.Contains("User-Agent"))
-                _httpClient.DefaultRequestHeaders.Add("User-Agent", userAgent);
         }
 
         public string GetChannelUrl(string urlOrChannelId)
@@ -32,6 +28,27 @@ namespace YoutubeParser
             if (!urlOrChannelId.Contains("www.youtube.com"))
                 return $"https://www.youtube.com/channel/{urlOrChannelId}";
             return urlOrChannelId;
+        }
+
+        public string GetVideoUrl(string urlOrVideolId)
+        {
+            if (!urlOrVideolId.Contains("www.youtube.com"))
+                return $"https://www.youtube.com/watch?v={urlOrVideolId}";
+            return urlOrVideolId;
+        }
+
+        public void SetDefaultHttpRequest(HttpRequestMessage request)
+        {
+            if (request.Headers.ConnectionClose == null)
+                request.Headers.ConnectionClose = true;
+            if (!request.Headers.Contains("User-Agent"))
+                request.Headers.Add("User-Agent", userAgent);
+            var cookie = request.Headers.TryGetValues("Cookie", out var cookies)
+                ? cookies.FirstOrDefault()?.Trim() ?? "" : "";
+            cookie += cookie != "" && !cookie.EndsWith(";") ? "; " : "";
+            cookie += $"PREF=hl={hl}";
+            //cookie += $"; CONSENT=YES+cb; YSC=DwKYllHNwuw";
+            request.Headers.Add("Cookie", cookie);
         }
     }
 }
