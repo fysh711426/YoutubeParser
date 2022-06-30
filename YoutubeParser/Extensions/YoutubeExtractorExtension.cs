@@ -17,14 +17,19 @@ namespace YoutubeParser.Extensions
 
         public static long GetCountValue(this string viewCount)
         {
-            var val = viewCount
-                .Pipe(it => Regex.Match(it, @"([\d,KM]+)"))
+            var clearViewCount = viewCount
+                .Pipe(it => Regex.Match(it, @"([\d,BKM]+)"))
+                .Select(m => m.Groups[1].Value);
+            var val = clearViewCount
+                .Pipe(it => Regex.Match(it, @"([\d]+)"))
                 .Select(m => m.Groups[1].Value)
                 .Pipe(it => it.Replace(",", ""))
                 .Pipe(it => it == "" ? 0 : double.Parse(it));
-            if (viewCount.Contains("M"))
+            if (clearViewCount.Contains("B"))
+                return (long)(val * 1000000000);
+            if (clearViewCount.Contains("M"))
                 return (long)(val * 1000000);
-            if (viewCount.Contains("K"))
+            if (clearViewCount.Contains("K"))
                 return (long)(val * 1000);
             return (long)val;
         }

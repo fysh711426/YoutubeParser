@@ -30,6 +30,10 @@ namespace YoutubeParser.Channels
             var html = await response.Content.ReadAsStringAsync();
             var extractor = new ChannelVideoPageExtractor(html);
 
+            var subMenuTitle = extractor.GetSelectedSubMenuTitle();
+            if (subMenuTitle != "Upcoming live streams")
+                return new List<ChannelVideo>();
+
             var videos = new List<ChannelVideo>();
             var videoItems = extractor.GetVideoItems();
             foreach (var item in videoItems)

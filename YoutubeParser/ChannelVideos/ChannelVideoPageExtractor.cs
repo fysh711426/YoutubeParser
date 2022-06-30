@@ -20,6 +20,10 @@ namespace YoutubeParser.ChannelVideos
             new YoutubePageExtractor(_html).TryGetSelectedTab()
         );
 
+        public string GetSelectedSubMenuTitle() => Memo.Cache(this, () =>
+            new YoutubePageExtractor(_html).TryGetSelectedSubMenu()?["title"]?.Value<string>() ?? ""
+        );
+
         private IEnumerable<JObject?> GetVideoGrids() => Memo.Cache(this, () =>
             TryGetSelectedTab()?["tabRenderer"]?["content"]?["sectionListRenderer"]?["contents"]?
                 .FirstOrDefault()?["itemSectionRenderer"]?["contents"]?

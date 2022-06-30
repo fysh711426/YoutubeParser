@@ -58,5 +58,16 @@ namespace YoutubeParser.Commons
                 .Select(m => m.Groups[1].Value)
                 .Pipe(it => JsonConvert.DeserializeObject<JObject>(it))
         );
+
+        public JToken? TryGetSubMenu() => Memo.Cache(this, () =>
+            TryGetSelectedTab()?["tabRenderer"]?["content"]?["sectionListRenderer"]?["subMenu"]
+        );
+
+        public JObject? TryGetSelectedSubMenu() => Memo.Cache(this, () =>
+            TryGetSubMenu()?["channelSubMenuRenderer"]?["contentTypeSubMenuItems"]?
+                .Values<JObject>()
+                .Where(it => it?["selected"]?.Value<bool>() == true)
+                .FirstOrDefault()
+        );
     }
 }
