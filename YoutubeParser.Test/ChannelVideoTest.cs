@@ -25,7 +25,7 @@ namespace YoutubeParser.Test
             Assert.AreEqual(channelVideo.VideoType, VideoType.Video);
             Assert.AreEqual(channelVideo.Duration, null);
             Assert.AreEqual(channelVideo.PublishedTime, "");
-            //Assert.AreEqual(channelVideo.UpcomingDate, DateTime.Parse(""));
+            Assert.AreEqual(channelVideo.UpcomingDate, DateTime.Parse("2022/7/1 19:00:00"));
             Assert.AreEqual(channelVideo.IsShorts, false);
         }
 
@@ -43,7 +43,7 @@ namespace YoutubeParser.Test
             Assert.AreEqual(channelVideo.VideoType, VideoType.Video);
             Assert.AreEqual(channelVideo.Duration, null);
             Assert.AreEqual(channelVideo.PublishedTime, "");
-            //Assert.AreEqual(channelVideo.UpcomingDate, DateTime.Parse(""));
+            Assert.AreEqual(channelVideo.UpcomingDate, DateTime.Parse("2024/6/8 06:00:00"));
             Assert.AreEqual(channelVideo.IsShorts, false);
         }
 
@@ -64,8 +64,8 @@ namespace YoutubeParser.Test
             Assert.IsNotNull(channelVideo);
             Assert.AreEqual(channelVideo.VideoStatus, VideoStatus.Default);
             Assert.AreEqual(channelVideo.VideoType, VideoType.Video);
-            //Assert.AreEqual(channelVideo.Duration, null);
-            //Assert.AreEqual(channelVideo.PublishedTime, "");
+            Assert.AreEqual(channelVideo.Duration, TimeSpan.Parse("00:10:32"));
+            Assert.AreNotEqual(channelVideo.PublishedTime, "");
             Assert.AreEqual(channelVideo.UpcomingDate, null);
             Assert.AreEqual(channelVideo.IsShorts, false);
         }
@@ -82,8 +82,8 @@ namespace YoutubeParser.Test
             Assert.IsNotNull(channelVideo);
             Assert.AreEqual(channelVideo.VideoStatus, VideoStatus.Default);
             Assert.AreEqual(channelVideo.VideoType, VideoType.Video);
-            //Assert.AreEqual(channelVideo.Duration, null);
-            //Assert.AreEqual(channelVideo.PublishedTime, "");
+            Assert.AreEqual(channelVideo.Duration, TimeSpan.Parse("00:08:40"));
+            Assert.AreNotEqual(channelVideo.PublishedTime, "");
             Assert.AreEqual(channelVideo.UpcomingDate, null);
             Assert.AreEqual(channelVideo.IsShorts, false);
         }
@@ -102,7 +102,7 @@ namespace YoutubeParser.Test
             Assert.AreEqual(channelVideo.VideoType, VideoType.Stream);
             Assert.AreEqual(channelVideo.Duration, null);
             Assert.AreEqual(channelVideo.PublishedTime, "");
-            //Assert.AreEqual(channelVideo.UpcomingDate, DateTime.Parse(""));
+            Assert.AreEqual(channelVideo.UpcomingDate, DateTime.Parse("2023/6/12 23:00:00"));
             Assert.AreEqual(channelVideo.IsShorts, false);
         }
 
@@ -120,7 +120,7 @@ namespace YoutubeParser.Test
             Assert.AreEqual(channelVideo.VideoType, VideoType.Stream);
             Assert.AreEqual(channelVideo.Duration, null);
             Assert.AreEqual(channelVideo.PublishedTime, "");
-            //Assert.AreEqual(channelVideo.UpcomingDate, DateTime.Parse(""));
+            Assert.AreEqual(channelVideo.UpcomingDate, DateTime.Parse("2024/6/1 05:45:00"));
             Assert.AreEqual(channelVideo.IsShorts, false);
         }
 
@@ -137,7 +137,7 @@ namespace YoutubeParser.Test
             Assert.AreEqual(channelVideo.VideoStatus, VideoStatus.Live);
             Assert.AreEqual(channelVideo.VideoType, VideoType.Stream);
             Assert.AreEqual(channelVideo.Duration, null);
-            //Assert.AreEqual(channelVideo.PublishedTime, "");
+            Assert.AreEqual(channelVideo.PublishedTime, "");
             Assert.AreEqual(channelVideo.UpcomingDate, null);
             Assert.AreEqual(channelVideo.IsShorts, false);
         }
@@ -154,8 +154,8 @@ namespace YoutubeParser.Test
             Assert.IsNotNull(channelVideo);
             Assert.AreEqual(channelVideo.VideoStatus, VideoStatus.Default);
             Assert.AreEqual(channelVideo.VideoType, VideoType.Stream);
-            //Assert.AreEqual(channelVideo.Duration, null);
-            //Assert.AreEqual(channelVideo.PublishedTime, "");
+            Assert.AreEqual(channelVideo.Duration, TimeSpan.Parse("01:57:21"));
+            Assert.AreNotEqual(channelVideo.PublishedTime, "");
             Assert.AreEqual(channelVideo.UpcomingDate, null);
             Assert.AreEqual(channelVideo.IsShorts, false);
         }
