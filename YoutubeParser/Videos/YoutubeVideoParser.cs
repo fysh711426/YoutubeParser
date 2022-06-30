@@ -19,9 +19,9 @@ namespace YoutubeParser.Videos
         }
 
         // ----- GetVideo -----
-        public async Task<Video> GetAsync(string urlOrVideolId)
+        public async Task<Video> GetAsync(string urlOrVideoId)
         {
-            var url = $"{GetVideoUrl(urlOrVideolId)}";
+            var url = $"{GetVideoUrl(urlOrVideoId)}";
             using var request = new HttpRequestMessage(HttpMethod.Get, url);
             SetDefaultHttpRequest(request);
             using var response = await _httpClient.SendAsync(request, HttpCompletionOption.ResponseHeadersRead);
