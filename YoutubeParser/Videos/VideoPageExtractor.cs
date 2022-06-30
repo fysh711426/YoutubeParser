@@ -51,7 +51,7 @@ namespace YoutubeParser.Videos
 
         public TimeSpan? TryGetDuration() => Memo.Cache(this, () =>
             TryGetInitialPlayerResponse()?["videoDetails"]?["lengthSeconds"]?.Value<double>()
-                .Pipe(it => TimeSpan.FromSeconds(it))
+                .Pipe(it => it != 0 ? (TimeSpan?)TimeSpan.FromSeconds(it) : null)
         );
 
         public List<string> GetKeywords() => Memo.Cache(this, () =>
@@ -83,27 +83,23 @@ namespace YoutubeParser.Videos
                 .ToList() ?? new List<Thumbnail>()
         );
 
-        public DateTime GetUploadDate() => Memo.Cache(this, () =>
-            TryGetInitialPlayerResponse()?["microformat"]?["playerMicroformatRenderer"]?["uploadDate"]?.Value<string>()?
-                .Pipe(it =>
-                    DateTime.TryParse(it, out var result)
-                        ? (DateTime?)result : null) ?? default(DateTime)
+        private string? TryGetUploadDate() => Memo.Cache(this, () =>
+            TryGetInitialPlayerResponse()?["microformat"]?["playerMicroformatRenderer"]?["uploadDate"]?.Value<string>()
         );
 
-        public JToken? GetliveBroadcast() => Memo.Cache(this, () =>
-            TryGetInitialPlayerResponse()?["microformat"]?["playerMicroformatRenderer"]?["liveBroadcastDetails"]
+        public DateTime GetUploadDate() => Memo.Cache(this, () =>
+            GetDateText()
+                .Pipe(it => Regex.Match(it, @"([A-Z][a-z]+\s[0-9]+,\s[0-9]+)"))
+                .Select(m => m.Groups[1].Value)
+                .Pipe(it => it != "" ? it : TryGetUploadDate())?
+                .Pipe(it => DateTime.TryParse(it, out var result) ?
+                    (DateTime?)result : null) ?? default(DateTime)
+                
         );
 
         public long? TryGetLikeCount() => Memo.Cache(this, () =>
             _html?
                 .Pipe(it => Regex.Match(it, @"""label""\s*:\s*""([\d,\.]+) likes"""))
-                .Select(m => m.Groups[1].Value)
-                .Pipe(it => it.GetCountValue())
-        );
-
-        public long? TryGetDislikeCount() => Memo.Cache(this, () =>
-            _html?
-                .Pipe(it => Regex.Match(it, @"""label""\s*:\s*""([\d,\.]+) dislikes"""))
                 .Select(m => m.Groups[1].Value)
                 .Pipe(it => it.GetCountValue())
         );
@@ -120,39 +116,41 @@ namespace YoutubeParser.Videos
             GetPlayabilityStatus().ToLower() == "ok"
         );
 
-        private string GetPublishedTime() => Memo.Cache(this, () =>
+        private string GetDateText() => Memo.Cache(this, () =>
             TryGetPrimaryInfo()?["dateText"]?["simpleText"]?.Value<string>() ?? ""
         );
 
-        //public long GetViewCount() => Memo.Cache(this, () =>
-        //    TryGetInitialPlayerResponse()?["videoDetails"]?["viewCount"]?.Value<long>() ?? 0
-        //);
-
-        private string? TryGetViewCountText() => Memo.Cache(this, () =>
+        private string? TryGetViewCountSimpleText() => Memo.Cache(this, () =>
             TryGetPrimaryInfo()?["viewCount"]?["videoViewCountRenderer"]?["viewCount"]?["simpleText"]?.Value<string>()
         );
 
-        private string? TryGetLiveViewCountText() => Memo.Cache(this, () =>
-            TryGetPrimaryInfo()?["viewCount"]?["videoViewCountRenderer"]?["viewCount"]?["runs"]?.FirstOrDefault()?["text"]?.Value<string>()
+        private string? TryGetViewCountRunsText() => Memo.Cache(this, () =>
+            TryGetPrimaryInfo()?["viewCount"]?["videoViewCountRenderer"]?["viewCount"]?["runs"]?
+                .Select(it => it?["text"]?.Value<string>() ?? "")
+                .Aggregate(new StringBuilder(), (r, it) => r.Append(it))
+                .ToString()
+        );
+
+        private string GetViewCountText() => Memo.Cache(this, () =>
+            TryGetViewCountSimpleText() ?? TryGetViewCountRunsText() ?? ""
         );
 
         public long GetViewCount() => Memo.Cache(this, () =>
-            TryGetViewCountText()?.GetCountValue() ??
-            TryGetLiveViewCountText()?.GetCountValue() ?? 0
+            GetViewCountText().GetCountValue()
         );
-
+        
         private bool IsLive() => Memo.Cache(this, () =>
-            TryGetPrimaryInfo()?["viewCount"]?["videoViewCountRenderer"]?["isLive"]?.Value<bool>() ?? false
+            GetViewCountText()?.ToLower()?.Contains("watching") == true
         );
 
         private bool IsStream() => Memo.Cache(this, () =>
-            GetPublishedTime().ToLower().Contains("stream") ||
-            GetPublishedTime().ToLower().Contains("scheduled")
+            GetDateText().ToLower().Contains("stream") ||
+            GetDateText().Contains("Scheduled")
         );
 
         private bool IsUpcoming() => Memo.Cache(this, () =>
-            GetPublishedTime().ToLower().Contains("scheduled") ||
-            GetPublishedTime().ToLower().Contains("premieres")
+            GetDateText().Contains("Scheduled") ||
+            GetDateText().Contains("Premieres")
         );
 
         public VideoType GetVideoType() => Memo.Cache(this, () =>

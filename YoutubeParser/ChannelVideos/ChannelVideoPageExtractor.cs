@@ -27,6 +27,10 @@ namespace YoutubeParser.ChannelVideos
                 .Values<JObject>() ?? new List<JObject>()
         );
 
+        public JToken? TryGetInnerTubeContext() =>
+            new YoutubePageExtractor(_html)
+                .TryGetYtcfg()?["INNERTUBE_CONTEXT"];
+
         public string? TryGetContinuation() => _TryGetContinuation();
 
         private string? _TryGetContinuation(JObject? grid = null) => Memo.Cache(this, () =>
@@ -74,22 +78,6 @@ namespace YoutubeParser.ChannelVideos
                     continue;
                 }
                 _TryGetContinuation(grid);
-            }
-        }
-
-        public IEnumerable<JToken> GetUpcomingLiveStreamItems()
-        {
-            var grids = GetVideoGrids();
-            foreach (var grid in grids)
-            {
-                if (grid?.ContainsKey("gridVideoRenderer") == true)
-                {
-                    var gridVideo = grid["gridVideoRenderer"];
-                    if (gridVideo != null)
-                    {
-                        yield return gridVideo;
-                    }
-                }
             }
         }
     }

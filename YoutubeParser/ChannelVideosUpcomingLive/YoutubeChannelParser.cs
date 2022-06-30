@@ -17,54 +17,35 @@ namespace YoutubeParser.Channels
     public partial class YoutubeChannelParser
     {
         // ----- GetVideos -----
-        private string? _continuation;
-        private JToken? _context;
+        private string? _continuationUpcomingLive;
+        private JToken? _contextUpcomingLive;
 
-        private ChannelVideo MapVideo(JToken grid)
+        public async Task<List<ChannelVideo>> GetUpcomingLiveListAsync(string urlOrChannelId)
         {
-            var extractor = new ChannelVideoExtractor(grid);
-            return new ChannelVideo
-            {
-                Title = extractor.GetTitle(),
-                VideoId = extractor.GetVideoId(),
-                Thumbnails = extractor.GetThumbnails(),
-                RichThumbnail = extractor.TryGetRichThumbnail(),
-                ViewCount = extractor.GetViewCount(),
-                Duration = extractor.TryGetDuration(),
-                PublishedTime = extractor.GetPublishedTime(),
-                PublishedTimeSeconds = extractor.GetPublishedTimeSeconds(),
-                UpcomingDate = extractor.TryGetUpcomingDate(),
-                VideoStatus = extractor.GetVideoStatus(),
-                VideoType = extractor.GetVideoType(),
-                IsShorts = extractor.IsShorts()
-            };
-        }
-
-        public async Task<List<ChannelVideo>> GetVideosListAsync(string urlOrChannelId)
-        {
-            var url = $"{GetChannelUrl(urlOrChannelId)}/videos";
+            var url = $"{GetChannelUrl(urlOrChannelId)}/videos?view=2&live_view=502";
             using var request = new HttpRequestMessage(HttpMethod.Get, url);
             SetDefaultHttpRequest(request);
             using var response = await _httpClient.SendAsync(request, HttpCompletionOption.ResponseHeadersRead);
             response.EnsureSuccessStatusCode();
             var html = await response.Content.ReadAsStringAsync();
             var extractor = new ChannelVideoPageExtractor(html);
-            
+
             var videos = new List<ChannelVideo>();
             var videoItems = extractor.GetVideoItems();
             foreach (var item in videoItems)
             {
-                videos.Add(MapVideo(item));
+                var video = MapVideo(item);
+                videos.Add(video);
             }
             // must be after each GetVideoItems
-            _continuation = extractor.TryGetContinuation();
-            _context = extractor.TryGetInnerTubeContext();
+            _continuationUpcomingLive = extractor.TryGetContinuation();
+            _contextUpcomingLive = extractor.TryGetInnerTubeContext();
             return videos;
         }
 
-        public async Task<List<ChannelVideo>?> GetNextVideosListAsync()
+        public async Task<List<ChannelVideo>?> GetNextUpcomingLiveListAsync()
         {
-            if (_continuation == null)
+            if (_continuationUpcomingLive == null)
                 return null;
 
             var apiUrl = $"https://www.youtube.com/youtubei/v1/browse?key={apiKey}";
@@ -73,8 +54,8 @@ namespace YoutubeParser.Channels
             using var request = new HttpRequestMessage(HttpMethod.Post, apiUrl);
             var payload = new
             {
-                context = _context,
-                continuation = _continuation
+                context = _contextUpcomingLive,
+                continuation = _continuationUpcomingLive
             };
             var content = new StringContent(
                 JsonConvert.SerializeObject(payload), Encoding.UTF8, "application/json");
@@ -91,21 +72,21 @@ namespace YoutubeParser.Channels
                 videos.Add(MapVideo(item));
             }
             // must be after each GetVideoItemsFromNext
-            _continuation = extractor.TryGetContinuation();
+            _continuationUpcomingLive = extractor.TryGetContinuation();
             return videos;
         }
 
 #if (!NET45 && !NET46)
-        public async IAsyncEnumerable<ChannelVideo> GetVideosAsync(string urlOrChannelId)
+        public async IAsyncEnumerable<ChannelVideo> GetUpcomingLiveAsync(string urlOrChannelId)
         {
-            var videos = await GetVideosListAsync(urlOrChannelId);
+            var videos = await GetUpcomingLiveListAsync(urlOrChannelId);
             foreach (var item in videos)
             {
                 yield return item;
             }
             while (true)
             {
-                var nextVideos = await GetNextVideosListAsync();
+                var nextVideos = await GetNextUpcomingLiveListAsync();
                 if (nextVideos == null)
                     break;
                 foreach (var item in nextVideos)

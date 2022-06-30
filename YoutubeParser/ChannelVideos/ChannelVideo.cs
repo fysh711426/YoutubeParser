@@ -21,6 +21,7 @@ namespace YoutubeParser.ChannelVideos
         public long ViewCount { get; set; }
         public string PublishedTime { get; set; } = "";
         public long PublishedTimeSeconds { get; set; }
+        public DateTime? UpcomingDate { get; set; }
         public string Url => $"https://www.youtube.com/watch?v={VideoId}";
         public string ShortUrl => $"http://youtu.be/{VideoId}";
     }

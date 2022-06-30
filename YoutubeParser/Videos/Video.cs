@@ -23,7 +23,6 @@ namespace YoutubeParser.Videos
         public long ViewCount { get; set; }
         public DateTime UploadDate { get; set; }
         public long? LikeCount { get; set; }
-        public long? DislikeCount { get; set; }
         public string Url => $"https://www.youtube.com/watch?v={VideoId}";
         public string ShortUrl => $"http://youtu.be/{VideoId}";
         public bool IsPrivate { get; set; }

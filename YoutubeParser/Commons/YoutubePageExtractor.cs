@@ -51,5 +51,12 @@ namespace YoutubeParser.Commons
         public JObject? TryGetJsonResponse() => Memo.Cache(this, () =>
             _html != null ? JsonConvert.DeserializeObject<JObject>(_html) : null
         );
+
+        public JObject? TryGetYtcfg() => Memo.Cache(this, () =>
+            _html?
+                .Pipe(it => Regex.Match(it, @"ytcfg\.set\s*\(\s*({.+?})\s*\)\s*;"))
+                .Select(m => m.Groups[1].Value)
+                .Pipe(it => JsonConvert.DeserializeObject<JObject>(it))
+        );
     }
 }

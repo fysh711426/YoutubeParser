@@ -42,7 +42,6 @@ namespace YoutubeParser.Videos
                 ViewCount = extractor.GetViewCount(),
                 UploadDate = extractor.GetUploadDate(),
                 LikeCount = extractor.TryGetLikeCount(),
-                DislikeCount = extractor.TryGetDislikeCount(),
                 IsPrivate = extractor.IsPrivate(),
                 IsPlayable = extractor.IsPlayable(),
                 VideoType = extractor.GetVideoType(),

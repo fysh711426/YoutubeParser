@@ -16,36 +16,69 @@ namespace YoutubeParser.ChannelVideos
 
         public ChannelVideoExtractor(JToken content) => _content = content;
 
-        private JToken? TryGetThumbnailOverlayTimeStatus() => Memo.Cache(this, () =>
+        private JToken? TryGetOverlayTimeStatus() => Memo.Cache(this, () =>
             _content["thumbnailOverlays"]?.FirstOrDefault()?["thumbnailOverlayTimeStatusRenderer"]
         );
 
+        private string GetOverlayTimeStatusStyle() => Memo.Cache(this, () =>
+            TryGetOverlayTimeStatus()?["style"]?.Value<string>() ?? ""
+        );
+
         private string? TryGetDurationText() => Memo.Cache(this, () =>
-            TryGetThumbnailOverlayTimeStatus()?["text"]?["simpleText"]?.Value<string>()
+            TryGetOverlayTimeStatus()?["text"]?["simpleText"]?.Value<string>()
         );
 
         private string? TryGetPublishedTime() => Memo.Cache(this, () =>
             _content["publishedTimeText"]?["simpleText"]?.Value<string>()
         );
 
-        private string? TryGetViewCountText() => Memo.Cache(this, () =>
+        public string? TryGetUpcomingStartTimeText() => Memo.Cache(this, () =>
+            _content["upcomingEventData"]?["startTime"]?.Value<string>()
+        );
+
+        public DateTime? TryGetUpcomingDate() => Memo.Cache(this, () =>
+            TryGetUpcomingStartTimeText()?
+                .Pipe(it => long.TryParse(it, out var result) ?
+                    (long?)result : null)?
+                        .Pipe(it => DateTime.Parse("1970/01/01")
+                            .AddSeconds(it).ToLocalTime())
+        );
+
+        public string GetUpcomingEvent() => Memo.Cache(this, () =>
+            _content["upcomingEventData"]?["upcomingEventText"]?["runs"]?.FirstOrDefault()?["text"]?.Value<string>() ?? ""
+        );
+
+        private string? TryGetViewCountSimpleText() => Memo.Cache(this, () =>
             _content["viewCountText"]?["simpleText"]?.Value<string>()
         );
 
-        private string? TryGetLiveViewCountText() => Memo.Cache(this, () =>
-            _content["viewCountText"]?["runs"]?.FirstOrDefault()?["text"]?.Value<string>()
+        private string? TryGetViewCountRunsText() => Memo.Cache(this, () =>
+            _content["viewCountText"]?["runs"]?
+                .Select(it => it?["text"]?.Value<string>() ?? "")
+                .Aggregate(new StringBuilder(), (r, it) => r.Append(it))
+                .ToString()
         );
 
-        private bool IsLive() => Memo.Cache(this, () =>
-            TryGetThumbnailOverlayTimeStatus()?["style"]?.Value<string>() == "LIVE"
+        private string GetViewCountText() => Memo.Cache(this, () =>
+            TryGetViewCountSimpleText() ?? TryGetViewCountRunsText() ?? ""
+        );
+
+        public long GetViewCount() => Memo.Cache(this, () =>
+            GetViewCountText().GetCountValue()
         );
 
         private bool IsStream() => Memo.Cache(this, () =>
-            IsLive() || GetPublishedTime().ToLower().Contains("stream")
+            GetPublishedTime().ToLower().Contains("stream") ||
+            GetUpcomingEvent().Contains("Scheduled") ||
+           (GetPublishedTime() == "" && GetOverlayTimeStatusStyle() == "LIVE")
+        );
+
+        private bool IsLive() => Memo.Cache(this, () =>
+            GetViewCountText()?.ToLower()?.Contains("watching") == true
         );
 
         private bool IsUpcoming() => Memo.Cache(this, () =>
-            TryGetThumbnailOverlayTimeStatus()?["style"]?.Value<string>() == "UPCOMING"
+            GetOverlayTimeStatusStyle() == "UPCOMING"
         );
 
         public bool IsShorts() => Memo.Cache(this, () =>
@@ -70,11 +103,6 @@ namespace YoutubeParser.ChannelVideos
 
         public long GetPublishedTimeSeconds() => Memo.Cache(this, () =>
             TryGetPublishedTime()?.GetPublishedTimeSeconds() ?? 0
-        );
-
-        public long GetViewCount() => Memo.Cache(this, () =>
-            TryGetViewCountText()?.GetCountValue() ??
-            TryGetLiveViewCountText()?.GetCountValue() ?? 0
         );
 
         public VideoType GetVideoType() => Memo.Cache(this, () =>

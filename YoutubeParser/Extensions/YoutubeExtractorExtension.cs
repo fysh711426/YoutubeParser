@@ -18,7 +18,7 @@ namespace YoutubeParser.Extensions
         public static long GetCountValue(this string viewCount)
         {
             var val = viewCount
-                .Pipe(it => Regex.Match(it, @"([\d,]+)"))
+                .Pipe(it => Regex.Match(it, @"([\d,KM]+)"))
                 .Select(m => m.Groups[1].Value)
                 .Pipe(it => it.Replace(",", ""))
                 .Pipe(it => it == "" ? 0 : double.Parse(it));
