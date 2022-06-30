@@ -20,6 +20,10 @@ namespace YoutubeParser.ChannelVideos
             _content["thumbnailOverlays"]?.FirstOrDefault()?["thumbnailOverlayTimeStatusRenderer"]
         );
 
+        private string GetOverlayTimeStatusText() => Memo.Cache(this, () =>
+            TryGetOverlayTimeStatus()?["text"]?["accessibility"]?["accessibilityData"]?["label"]?.Value<string>() ?? ""
+        );
+
         private string GetOverlayTimeStatusStyle() => Memo.Cache(this, () =>
             TryGetOverlayTimeStatus()?["style"]?.Value<string>() ?? ""
         );
@@ -70,11 +74,11 @@ namespace YoutubeParser.ChannelVideos
         private bool IsStream() => Memo.Cache(this, () =>
             GetPublishedTime().ToLower().Contains("stream") ||
             GetUpcomingEvent().Contains("Scheduled") ||
-           (GetPublishedTime() == "" && GetOverlayTimeStatusStyle() == "LIVE")
+            GetOverlayTimeStatusText() == "LIVE"
         );
 
         private bool IsLive() => Memo.Cache(this, () =>
-            GetViewCountText()?.ToLower()?.Contains("watching") == true
+            GetOverlayTimeStatusStyle() == "LIVE"
         );
 
         private bool IsUpcoming() => Memo.Cache(this, () =>

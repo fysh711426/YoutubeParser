@@ -26,6 +26,31 @@ namespace YoutubeParser.Test
         [TestMethod]
         public void Live_Video()
         {
+            var file = Path.Combine(TestFile.DirPath, "Video_Live_Video_Html.txt");
+            var html = File.ReadAllText(file);
+            var extractor = new VideoPageExtractor(html);
+            var video = Map(extractor);
+            Assert.IsNotNull(video);
+            Assert.AreEqual(video.VideoStatus, VideoStatus.Live);
+            Assert.AreEqual(video.VideoType, VideoType.Video);
+            Assert.AreEqual(video.Duration, TimeSpan.Parse("00:23:21"));
+            Assert.AreEqual(video.UploadDate, DateTime.Parse("2022/6/30"));
+            Assert.AreEqual(video.IsPlayable, true);
+        }
+
+        [TestMethod]
+        public void Live_Video_Waiting()
+        {
+            var file = Path.Combine(TestFile.DirPath, "Video_Live_Video_Waiting_Html.txt");
+            var html = File.ReadAllText(file);
+            var extractor = new VideoPageExtractor(html);
+            var video = Map(extractor);
+            Assert.IsNotNull(video);
+            Assert.AreEqual(video.VideoStatus, VideoStatus.Live);
+            Assert.AreEqual(video.VideoType, VideoType.Video);
+            Assert.AreEqual(video.Duration, TimeSpan.Parse("00:23:21"));
+            Assert.AreEqual(video.UploadDate, DateTime.Parse("2022/6/30"));
+            Assert.AreEqual(video.IsPlayable, true);
         }
 
         [TestMethod]

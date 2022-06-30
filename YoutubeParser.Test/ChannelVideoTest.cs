@@ -50,6 +50,19 @@ namespace YoutubeParser.Test
         [TestMethod]
         public void Live_Video()
         {
+            var file = Path.Combine(TestFile.DirPath, "ChannelVideo_Live_Video_Html.txt");
+            var html = File.ReadAllText(file);
+            var pageExtractor = new ChannelVideoPageExtractor(html);
+            var channelVideoItem = pageExtractor.GetVideoItems().Skip(4).First();
+            var extractor = new ChannelVideoExtractor(channelVideoItem);
+            var channelVideo = Map(extractor);
+            Assert.IsNotNull(channelVideo);
+            Assert.AreEqual(channelVideo.VideoStatus, VideoStatus.Live);
+            Assert.AreEqual(channelVideo.VideoType, VideoType.Video);
+            Assert.AreEqual(channelVideo.Duration, null);
+            Assert.AreEqual(channelVideo.PublishedTime, "");
+            Assert.AreEqual(channelVideo.UpcomingDate, null);
+            Assert.AreEqual(channelVideo.IsShorts, false);
         }
 
         [TestMethod]

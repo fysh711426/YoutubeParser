@@ -140,7 +140,7 @@ namespace YoutubeParser.Videos
         );
         
         private bool IsLive() => Memo.Cache(this, () =>
-            GetViewCountText()?.ToLower()?.Contains("watching") == true
+            GetDateText().Contains("Started")
         );
 
         private bool IsStream() => Memo.Cache(this, () =>
