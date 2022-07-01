@@ -6,7 +6,7 @@
     <Authors>fysh711426</Authors>
     <PackageId>YoutubeParser</PackageId>
     <Description>This is a library for parsing youtube pages.
-It focuses more on channel pages than others, for example you can use it to get channel videos, live videos, upcoming videos, or community articles.
+It focuses more on channel than others library, for example you can use it to get channel videos, live videos, upcoming videos, or community articles.
     </Description>
     <Version>1.0.1</Version>
     <PackageProjectUrl>https://github.com/fysh711426/YoutubeParser</PackageProjectUrl>
