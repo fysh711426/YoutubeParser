@@ -30,28 +30,6 @@ var channel = await youtube.Channel.GetAsync(channelId);
 
 #### Get Channel Videos  
 
-```C#
-// Get Channel Videos
-var videos = new List<ChannelVideo>();
-var enumerable = youtube.Channel.GetVideosAsync(channelId);
-await foreach (var item in enumerable)
-{
-    videos.Add(item);
-}
-
-// NET45 or NET46
-var videoList = await youtube
-    .Channel.GetVideosListAsync(channelId);
-while (true)
-{
-    var nextVideoList = await youtube
-        .Channel.GetNextVideosListAsync();
-    if (nextVideoList == null)
-        break;
-    videoList.AddRange(nextVideoList);
-}
-```
-
 > If you want to use LINQ on IAsyncEnumerable you need to install this package.  
 
 ```
@@ -62,6 +40,32 @@ PM> Install-Package System.Linq.Async
 var videos = await youtube.Channel
     .GetVideosAsync(channelId)
     .ToListAsync();
+```
+
+Or use await foreach.  
+
+```C#
+var videos = new List<ChannelVideo>();
+var enumerable = youtube.Channel.GetVideosAsync(channelId);
+await foreach (var item in enumerable)
+{
+    videos.Add(item);
+}
+```
+
+On `NET45` or `NET46` you can only use this.  
+
+```C#
+var videoList = await youtube
+    .Channel.GetVideosListAsync(channelId);
+while (true)
+{
+    var nextVideoList = await youtube
+        .Channel.GetNextVideosListAsync();
+    if (nextVideoList == null)
+        break;
+    videoList.AddRange(nextVideoList);
+}
 ```
 
 #### Get Live Streams Videos  
