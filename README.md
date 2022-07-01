@@ -133,10 +133,10 @@ var shortsVideos = await youtube.Channel
     .ToListAsync();
 ```
 
-#### Get videos in last 30 days  
+#### Get videos in last month  
 
 ```C#
-var inLast30Days = await youtube.Channel
+var inLastMonth = await youtube.Channel
     .GetVideosAsync(channelId)
     .Break(it => it.PublishedTimeSeconds >= TimeSeconds.Month)
     .ToListAsync();

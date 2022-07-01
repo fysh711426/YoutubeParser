@@ -68,8 +68,8 @@ namespace Example
                 .Where(it => it.IsShorts)
                 .ToListAsync();
 
-            // Get Videos in last 30 days
-            var inLast30Days = await youtube.Channel
+            // Get Videos in last month
+            var inLastMonth = await youtube.Channel
                 .GetVideosAsync(channelId)
                 .Break(it => it.PublishedTimeSeconds >= TimeSeconds.Month)
                 .ToListAsync();
