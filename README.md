@@ -34,67 +34,67 @@ var channel = await youtube.Channel.GetAsync(channelId);
 
 ```C#
 // Get Channel Videos
-var videoList = new List<ChannelVideo>();
+var videos = new List<ChannelVideo>();
 var enumerable = youtube.Channel.GetVideosAsync(channelId);
 await foreach (var item in enumerable)
 {
-    videoList.Add(item);
+    videos.Add(item);
 }
 
 // NET45 or NET46
-var videos = await youtube
+var videoList = await youtube
     .Channel.GetVideosListAsync(channelId);
 while (true)
 {
-    var nextVideos = await youtube
+    var nextVideoList = await youtube
         .Channel.GetNextVideosListAsync();
-    if (nextVideos == null)
+    if (nextVideoList == null)
         break;
-    videos.AddRange(nextVideos);
+    videoList.AddRange(nextVideoList);
 }
+```
+
+> If you want to use LINQ on IAsyncEnumerable you need to install this package.  
+
+```
+PM> Install-Package System.Linq.Async
+```  
+
+```C#
+var videos = await youtube.Channel
+    .GetVideosAsync(channelId)
+    .ToListAsync();
 ```
 
 #### Get Live Streams Videos  
 
 ```C#
-// Get Live Streams Videos
-var liveList = new List<ChannelVideo>();
-var liveStreams = youtube.Channel.GetLiveAsync(channelId);
-await foreach(var item in liveStreams)
-{
-    liveList.Add(item);
-}
+var liveStreams = youtube.Channel
+    .GetLiveAsync(channelId)
+    .ToListAsync();
 ```
 
 #### Get Upcoming Live Streams Videos  
 
 ```C#
-// Get Upcoming Live Streams Videos
-var upcomingLiveList = new List<ChannelVideo>();
-var upcomingLiveStreams = youtube.Channel.GetUpcomingLiveAsync(channelId);
-await foreach (var item in upcomingLiveStreams)
-{
-    upcomingLiveList.Add(item);
-}
+var upcomingLiveStreams = youtube.Channel
+    .GetUpcomingLiveAsync(channelId)
+    .ToListAsync();
 ```
 
 #### Get Channel Communitys  
 
 ```C#
-// Get Channel Communitys
-var communityList = new List<Community>();
-var communityEnumerable = youtube.Channel.GetCommunitysAsync(channelId);
-await foreach (var item in communityEnumerable)
-{
-    communityList.Add(item);
-}
+var communitys = youtube.Channel
+    .GetCommunitysAsync(channelId)
+    .ToListAsync();
 ```
 
 ---  
 
 ### Parameters  
 
-You can use these two parameters to filter videos in the video list.  
+You can use parameters to filter videos in the video list.  
 
 * VideoType 
 
@@ -110,4 +110,43 @@ Status    | Description
  Default  | Streamed or Premiered or Upload video
  Live     | Streaming or Premiere in progress
  Upcoming | Scheduled or Premieres
- 
+
+#### Get all past live streams  
+
+```C#
+var pastLiveStreams = await youtube.Channel
+    .GetVideosAsync(channelId)
+    .Where(it =>
+        it.VideoType == VideoType.Stream &&
+        it.VideoStatus == VideoStatus.Default)
+    .ToListAsync();
+```
+
+#### Get shorts videos  
+
+```C#
+var shortsVideos = await youtube.Channel
+    .GetVideosAsync(channelId)
+    .Where(it => it.IsShorts)
+    .ToListAsync();
+```
+
+#### Get videos in last 30 days  
+
+```C#
+var inLast30Days = await youtube.Channel
+    .GetVideosAsync(channelId)
+    .Break(it => it.PublishedTimeSeconds >= TimeSeconds.Month)
+    .ToListAsync();
+```
+
+The `Break` method leaves loop when the condition is true, use it can prevent requests wasted.  
+
+```C#
+await foreach(var item in source)
+{
+    if (predicate(item))
+        break;
+    yield return item;
+}
+```

@@ -3,6 +3,16 @@
   <PropertyGroup>
     <TargetFrameworks>net6.0;net5.0;net48;net47;net46;net45;netstandard2.1;netstandard2.0</TargetFrameworks>
     <Nullable>enable</Nullable>
+    <Authors>fysh711426</Authors>
+    <PackageId>YoutubeParser</PackageId>
+    <Description>This is a library for parsing youtube pages.
+It focuses more on channel pages than others, for example you can use it to get channel videos, live videos, upcoming videos, or community articles.
+    </Description>
+    <Version>1.0.1</Version>
+    <PackageProjectUrl>https://github.com/fysh711426/YoutubeParser</PackageProjectUrl>
+    <PackageLicenseExpression>MIT</PackageLicenseExpression>
+    <PackageLicenseFile></PackageLicenseFile>
+    <GenerateDocumentationFile>true</GenerateDocumentationFile>
   </PropertyGroup>
 
   <PropertyGroup>

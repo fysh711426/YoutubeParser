@@ -1,6 +1,9 @@
 ﻿using System.Globalization;
 using YoutubeParser;
 using YoutubeParser.ChannelVideos;
+using YoutubeParser.Commons;
+using YoutubeParser.Extensions;
+using YoutubeParser.Utils;
 
 namespace Example
 {
@@ -19,49 +22,57 @@ namespace Example
             // Get Channel
             var channel = await youtube.Channel.GetAsync(channelId);
 
-            // Get Channel Videos
-            var videoList = new List<ChannelVideo>();
-            var enumerable = youtube.Channel.GetVideosAsync(channelId);
-            await foreach (var item in enumerable)
-            {
-                videoList.Add(item);
-            }
-
             // NET45 or NET46
-            var videos = await youtube
+            var videoList = await youtube
                 .Channel.GetVideosListAsync(channelId);
             while (true)
             {
-                var nextVideos = await youtube
+                var nextVideoList = await youtube
                     .Channel.GetNextVideosListAsync();
-                if (nextVideos == null)
+                if (nextVideoList == null)
                     break;
-                videos.AddRange(nextVideos);
+                videoList.AddRange(nextVideoList);
             }
+
+            // Get Channel Videos
+            var videos = await youtube.Channel
+                .GetVideosAsync(channelId)
+                .ToListAsync();
 
             // Get Live Streams Videos
-            var liveList = new List<ChannelVideo>();
-            var liveStreams = youtube.Channel.GetLiveAsync(channelId);
-            await foreach(var item in liveStreams)
-            {
-                liveList.Add(item);
-            }
+            var liveStreams = youtube.Channel
+                .GetLiveAsync(channelId)
+                .ToListAsync();
 
             // Get Upcoming Live Streams Videos
-            var upcomingLiveList = new List<ChannelVideo>();
-            var upcomingLiveStreams = youtube.Channel.GetUpcomingLiveAsync(channelId);
-            await foreach (var item in upcomingLiveStreams)
-            {
-                upcomingLiveList.Add(item);
-            }
+            var upcomingLiveStreams = youtube.Channel
+                .GetUpcomingLiveAsync(channelId)
+                .ToListAsync();
 
             // Get Channel Communitys
-            var communityList = new List<Community>();
-            var communityEnumerable = youtube.Channel.GetCommunitysAsync(channelId);
-            await foreach (var item in communityEnumerable)
-            {
-                communityList.Add(item);
-            }
+            var communitys = youtube.Channel
+                .GetCommunitysAsync(channelId)
+                .ToListAsync();
+
+            // Get all past live streams
+            var pastLiveStreams = await youtube.Channel
+                .GetVideosAsync(channelId)
+                .Where(it =>
+                    it.VideoType == VideoType.Stream &&
+                    it.VideoStatus == VideoStatus.Default)
+                .ToListAsync();
+
+            // Get shorts videos
+            var shortsVideos = await youtube.Channel
+                .GetVideosAsync(channelId)
+                .Where(it => it.IsShorts)
+                .ToListAsync();
+
+            // Get Videos in last 30 days
+            var inLast30Days = await youtube.Channel
+                .GetVideosAsync(channelId)
+                .Break(it => it.PublishedTimeSeconds >= TimeSeconds.Month)
+                .ToListAsync();
         }
     }
 }
