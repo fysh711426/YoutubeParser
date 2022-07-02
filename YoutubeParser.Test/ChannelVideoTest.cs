@@ -27,6 +27,7 @@ namespace YoutubeParser.Test
             Assert.AreEqual(channelVideo.PublishedTime, "");
             Assert.AreEqual(channelVideo.UpcomingDate, DateTime.Parse("2022/7/1 19:00:00"));
             Assert.AreEqual(channelVideo.IsShorts, false);
+            Assert.AreEqual(channelVideo.ViewCount, 27);
         }
 
         [TestMethod]
@@ -45,6 +46,7 @@ namespace YoutubeParser.Test
             Assert.AreEqual(channelVideo.PublishedTime, "");
             Assert.AreEqual(channelVideo.UpcomingDate, DateTime.Parse("2024/6/8 06:00:00"));
             Assert.AreEqual(channelVideo.IsShorts, false);
+            Assert.AreEqual(channelVideo.ViewCount, 0);
         }
 
         [TestMethod]
@@ -63,6 +65,7 @@ namespace YoutubeParser.Test
             Assert.AreEqual(channelVideo.PublishedTime, "");
             Assert.AreEqual(channelVideo.UpcomingDate, null);
             Assert.AreEqual(channelVideo.IsShorts, false);
+            Assert.AreEqual(channelVideo.ViewCount, 5);
         }
 
         [TestMethod]
@@ -81,6 +84,7 @@ namespace YoutubeParser.Test
             Assert.AreNotEqual(channelVideo.PublishedTime, "");
             Assert.AreEqual(channelVideo.UpcomingDate, null);
             Assert.AreEqual(channelVideo.IsShorts, false);
+            Assert.AreEqual(channelVideo.ViewCount, 8181);
         }
 
         [TestMethod]
@@ -99,6 +103,7 @@ namespace YoutubeParser.Test
             Assert.AreNotEqual(channelVideo.PublishedTime, "");
             Assert.AreEqual(channelVideo.UpcomingDate, null);
             Assert.AreEqual(channelVideo.IsShorts, false);
+            Assert.AreEqual(channelVideo.ViewCount, 2250156);
         }
 
         [TestMethod]
@@ -117,6 +122,7 @@ namespace YoutubeParser.Test
             Assert.AreEqual(channelVideo.PublishedTime, "");
             Assert.AreEqual(channelVideo.UpcomingDate, DateTime.Parse("2023/6/12 23:00:00"));
             Assert.AreEqual(channelVideo.IsShorts, false);
+            Assert.AreEqual(channelVideo.ViewCount, 1);
         }
 
         [TestMethod]
@@ -135,6 +141,7 @@ namespace YoutubeParser.Test
             Assert.AreEqual(channelVideo.PublishedTime, "");
             Assert.AreEqual(channelVideo.UpcomingDate, DateTime.Parse("2024/6/1 05:45:00"));
             Assert.AreEqual(channelVideo.IsShorts, false);
+            Assert.AreEqual(channelVideo.ViewCount, 0);
         }
 
         [TestMethod]
@@ -153,6 +160,7 @@ namespace YoutubeParser.Test
             Assert.AreEqual(channelVideo.PublishedTime, "");
             Assert.AreEqual(channelVideo.UpcomingDate, null);
             Assert.AreEqual(channelVideo.IsShorts, false);
+            Assert.AreEqual(channelVideo.ViewCount, 116);
         }
 
         [TestMethod]
@@ -171,6 +179,7 @@ namespace YoutubeParser.Test
             Assert.AreNotEqual(channelVideo.PublishedTime, "");
             Assert.AreEqual(channelVideo.UpcomingDate, null);
             Assert.AreEqual(channelVideo.IsShorts, false);
+            Assert.AreEqual(channelVideo.ViewCount, 848);
         }
 
         internal ChannelVideo Map(ChannelVideoExtractor extractor)

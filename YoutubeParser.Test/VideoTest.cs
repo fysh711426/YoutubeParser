@@ -21,6 +21,7 @@ namespace YoutubeParser.Test
             Assert.AreEqual(video.Duration, null);
             Assert.AreEqual(video.UploadDate, DateTime.Parse("2022/7/1"));
             Assert.AreEqual(video.IsPlayable, false);
+            Assert.AreEqual(video.ViewCount, 26);
         }
 
         [TestMethod]
@@ -36,6 +37,7 @@ namespace YoutubeParser.Test
             Assert.AreEqual(video.Duration, TimeSpan.Parse("00:23:21"));
             Assert.AreEqual(video.UploadDate, DateTime.Parse("2022/6/30"));
             Assert.AreEqual(video.IsPlayable, true);
+            Assert.AreEqual(video.ViewCount, 10);
         }
 
         [TestMethod]
@@ -51,6 +53,7 @@ namespace YoutubeParser.Test
             Assert.AreEqual(video.Duration, TimeSpan.Parse("00:23:21"));
             Assert.AreEqual(video.UploadDate, DateTime.Parse("2022/6/30"));
             Assert.AreEqual(video.IsPlayable, true);
+            Assert.AreEqual(video.ViewCount, 6);
         }
 
         [TestMethod]
@@ -66,6 +69,7 @@ namespace YoutubeParser.Test
             Assert.AreEqual(video.Duration, TimeSpan.Parse("00:10:32"));
             Assert.AreEqual(video.UploadDate, DateTime.Parse("2022/6/30"));
             Assert.AreEqual(video.IsPlayable, true);
+            Assert.AreEqual(video.ViewCount, 8181);
         }
 
         [TestMethod]
@@ -81,6 +85,7 @@ namespace YoutubeParser.Test
             Assert.AreEqual(video.Duration, TimeSpan.Parse("00:08:39"));
             Assert.AreEqual(video.UploadDate, DateTime.Parse("2022/6/25"));
             Assert.AreEqual(video.IsPlayable, true);
+            Assert.AreEqual(video.ViewCount, 2250156);
         }
 
         [TestMethod]
@@ -97,6 +102,7 @@ namespace YoutubeParser.Test
             Assert.AreEqual(video.Duration, null);
             Assert.AreEqual(video.UploadDate, DateTime.Parse("2023/6/12"));
             Assert.AreEqual(video.IsPlayable, false);
+            Assert.AreEqual(video.ViewCount, 1);
         }
 
         [TestMethod]
@@ -112,6 +118,7 @@ namespace YoutubeParser.Test
             Assert.AreEqual(video.Duration, null);
             Assert.AreEqual(video.UploadDate, DateTime.Parse("2022/6/27"));
             Assert.AreEqual(video.IsPlayable, true);
+            Assert.AreEqual(video.ViewCount, 118);
         }
 
         [TestMethod]
@@ -127,6 +134,7 @@ namespace YoutubeParser.Test
             Assert.AreEqual(video.Duration, TimeSpan.Parse("01:57:20"));
             Assert.AreEqual(video.UploadDate, DateTime.Parse("2022/6/28"));
             Assert.AreEqual(video.IsPlayable, true);
+            Assert.AreEqual(video.ViewCount, 848);
         }
 
         [TestMethod]
@@ -142,6 +150,8 @@ namespace YoutubeParser.Test
             Assert.AreEqual(video.Duration, TimeSpan.Parse("02:15:09"));
             Assert.AreEqual(video.UploadDate, DateTime.Parse("2022/6/29"));
             Assert.AreEqual(video.IsPlayable, true);
+            Assert.AreEqual(video.ViewCount, 396665);
+            Assert.AreEqual(video.LikeCount, 23960);
         }
 
         internal Video Map(VideoPageExtractor extractor)
