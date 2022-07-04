@@ -5,6 +5,7 @@ using System.Net.Http;
 using System.Text;
 using System.Threading.Tasks;
 using YoutubeParser.Channels;
+using YoutubeParser.Communitys;
 using YoutubeParser.Utils;
 using YoutubeParser.Videos;
 
@@ -14,6 +15,7 @@ namespace YoutubeParser
     {
         public YoutubeChannelParser Channel { get; set; }
         public YoutubeVideoParser Video { get; set; }
+        public YoutubeCommunityParser Community { get; set; }
         public YoutubeClient() : 
             this(Http.Client)
         {
@@ -22,6 +24,7 @@ namespace YoutubeParser
         {
             Channel = new YoutubeChannelParser(httpClient);
             Video = new YoutubeVideoParser(httpClient);
+            Community = new YoutubeCommunityParser(httpClient);
         }
     }
 }

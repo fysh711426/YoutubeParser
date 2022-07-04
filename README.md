@@ -53,7 +53,7 @@ await foreach (var item in enumerable)
 }
 ```
 
-On `NET45` or `NET46` you can only use this.  
+`NET45` or `NET46` you can only use this.  
 
 ```C#
 var videoList = await youtube
@@ -71,7 +71,7 @@ while (true)
 #### Get Live Streams Videos  
 
 ```C#
-var liveStreams = youtube.Channel
+var liveStreams = await youtube.Channel
     .GetLiveAsync(channelId)
     .ToListAsync();
 ```
@@ -79,7 +79,7 @@ var liveStreams = youtube.Channel
 #### Get Upcoming Live Streams Videos  
 
 ```C#
-var upcomingLiveStreams = youtube.Channel
+var upcomingLiveStreams = await youtube.Channel
     .GetUpcomingLiveAsync(channelId)
     .ToListAsync();
 ```
@@ -87,7 +87,7 @@ var upcomingLiveStreams = youtube.Channel
 #### Get Channel Communitys  
 
 ```C#
-var communitys = youtube.Channel
+var communitys = await youtube.Channel
     .GetCommunitysAsync(channelId)
     .ToListAsync();
 ```

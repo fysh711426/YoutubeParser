@@ -10,11 +10,6 @@ namespace YoutubeParser.Extensions
 {
     internal static class YoutubeExtractorExtension
     {
-        public static bool GetIsStream(this string publishedTime)
-        {
-            return publishedTime.Contains("Streamed");
-        }
-
         public static long GetCountValue(this string viewCount)
         {
             var clearViewCount = viewCount

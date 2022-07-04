@@ -9,6 +9,7 @@ using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using YoutubeParser.ChannelVideos;
 using YoutubeParser.Commons;
+using YoutubeParser.Communitys;
 using YoutubeParser.Extensions;
 using YoutubeParser.Utils;
 
@@ -57,11 +58,7 @@ namespace YoutubeParser.Channels
             }
             // must be after each GetVideoItems
             _continuationCommunity = extractor.TryGetContinuation();
-            var ytcfg = html
-                .Pipe(it => Regex.Match(it, @"ytcfg\.set\s*\(\s*({.+?})\s*\)\s*;"))
-                .Select(m => m.Groups[1].Value)
-                .Pipe(it => JsonConvert.DeserializeObject<JObject>(it));
-            _contextCommunity = ytcfg?["INNERTUBE_CONTEXT"];
+            _contextCommunity = extractor.TryGetInnerTubeContext();
             return communitys;
         }
 

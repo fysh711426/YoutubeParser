@@ -8,7 +8,7 @@ using YoutubeParser.Commons;
 using YoutubeParser.Extensions;
 using YoutubeParser.Utils;
 
-namespace YoutubeParser.ChannelVideos
+namespace YoutubeParser.Communitys
 {
     internal class CommunityExtractor
     {

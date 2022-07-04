@@ -37,6 +37,13 @@ namespace YoutubeParser
             return urlOrVideolId;
         }
 
+        public string GetCommunityUrl(string urlOrCommunityId)
+        {
+            if (!urlOrCommunityId.Contains("www.youtube.com"))
+                return $"https://www.youtube.com/post/{urlOrCommunityId}";
+            return urlOrCommunityId;
+        }
+
         public void SetDefaultHttpRequest(HttpRequestMessage request)
         {
             if (request.Headers.ConnectionClose == null)

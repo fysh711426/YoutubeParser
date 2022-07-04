@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 using YoutubeParser.Commons;
 using YoutubeParser.Utils;
 
-namespace YoutubeParser.ChannelVideos
+namespace YoutubeParser.Communitys
 {
     internal class CommunityPageExtractor
     {
@@ -24,6 +24,10 @@ namespace YoutubeParser.ChannelVideos
                 .FirstOrDefault()?["itemSectionRenderer"]?["contents"]?
                 .Values<JObject>() ?? new List<JObject>()
         );
+
+        public JToken? TryGetInnerTubeContext() =>
+            new YoutubePageExtractor(_html)
+                .TryGetYtcfg()?["INNERTUBE_CONTEXT"];
 
         public string? TryGetContinuation() => _TryGetContinuation();
 

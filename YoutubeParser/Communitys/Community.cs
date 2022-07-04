@@ -6,7 +6,7 @@ using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using YoutubeParser.Commons;
 
-namespace YoutubeParser.ChannelVideos
+namespace YoutubeParser.Communitys
 {
     public class Community
     {
