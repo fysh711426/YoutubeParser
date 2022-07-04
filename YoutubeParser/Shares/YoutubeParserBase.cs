@@ -1,13 +1,7 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
+﻿using System.Linq;
 using System.Net.Http;
-using System.Text;
-using System.Text.RegularExpressions;
-using System.Threading.Tasks;
-using YoutubeParser.Extensions;
 
-namespace YoutubeParser
+namespace YoutubeParser.Shares
 {
     public abstract class YoutubeParserBase
     {
@@ -18,33 +12,33 @@ namespace YoutubeParser
             @"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/97.0.4692.99 Safari/537.36";
         protected readonly HttpClient _httpClient;
 
-        public YoutubeParserBase(HttpClient httpClient)
+        protected YoutubeParserBase(HttpClient httpClient)
         {
             _httpClient = httpClient;
         }
 
-        public string GetChannelUrl(string urlOrChannelId)
+        protected string GetChannelUrl(string urlOrChannelId)
         {
             if (!urlOrChannelId.Contains("www.youtube.com"))
                 return $"https://www.youtube.com/channel/{urlOrChannelId}";
             return urlOrChannelId;
         }
 
-        public string GetVideoUrl(string urlOrVideolId)
+        protected string GetVideoUrl(string urlOrVideolId)
         {
             if (!urlOrVideolId.Contains("www.youtube.com"))
                 return $"https://www.youtube.com/watch?v={urlOrVideolId}";
             return urlOrVideolId;
         }
 
-        public string GetCommunityUrl(string urlOrCommunityId)
+        protected string GetCommunityUrl(string urlOrCommunityId)
         {
             if (!urlOrCommunityId.Contains("www.youtube.com"))
                 return $"https://www.youtube.com/post/{urlOrCommunityId}";
             return urlOrCommunityId;
         }
 
-        public void SetDefaultHttpRequest(HttpRequestMessage request)
+        protected void SetDefaultHttpRequest(HttpRequestMessage request)
         {
             if (request.Headers.ConnectionClose == null)
                 request.Headers.ConnectionClose = true;

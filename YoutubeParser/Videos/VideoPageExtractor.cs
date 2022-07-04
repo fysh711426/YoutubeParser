@@ -4,9 +4,8 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Text.RegularExpressions;
-using System.Threading.Tasks;
-using YoutubeParser.Commons;
 using YoutubeParser.Extensions;
+using YoutubeParser.Shares;
 using YoutubeParser.Utils;
 
 namespace YoutubeParser.Videos
@@ -28,12 +27,6 @@ namespace YoutubeParser.Videos
         private JObject? TryGetPrimaryInfo() => Memo.Cache(this, () =>
             TryGetContents()?.Values<JObject>()
                 .Select(it => it?["videoPrimaryInfoRenderer"]?.Value<JObject>())
-                .FirstOrDefault(it => it != null)
-        );
-
-        private JObject? TryGetSecondaryInfo() => Memo.Cache(this, () =>
-            TryGetContents()?.Values<JObject>()
-                .Select(it => it?["videoSecondaryInfoRenderer"]?.Value<JObject>())
                 .FirstOrDefault(it => it != null)
         );
 

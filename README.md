@@ -26,6 +26,9 @@ var video = await youtube.Video.GetAsync(videoId);
 
 // Get Channel
 var channel = await youtube.Channel.GetAsync(channelId);
+
+// Get Community
+var community = await youtube.Community.GetAsync(communityId);
 ```
 
 #### Get Channel Videos  

@@ -1,10 +1,7 @@
 using Microsoft.VisualStudio.TestTools.UnitTesting;
-using System.Reflection;
-using YoutubeParser.Channels;
 using YoutubeParser.ChannelVideos;
-using YoutubeParser.Commons;
+using YoutubeParser.Shares;
 using YoutubeParser.Test.Utils;
-using YoutubeParser.Utils;
 
 namespace YoutubeParser.Test
 {

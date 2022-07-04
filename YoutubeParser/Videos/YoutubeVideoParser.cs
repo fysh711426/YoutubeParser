@@ -1,17 +1,10 @@
-﻿using Newtonsoft.Json;
-using Newtonsoft.Json.Linq;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Net.Http;
-using System.Text;
-using System.Text.RegularExpressions;
+﻿using System.Net.Http;
 using System.Threading.Tasks;
-using YoutubeParser.Extensions;
+using YoutubeParser.Shares;
 
 namespace YoutubeParser.Videos
 {
-    public class YoutubeVideoParser : YoutubeParserBase
+    public partial class YoutubeVideoParser : YoutubeParserBase
     {
         public YoutubeVideoParser(HttpClient httpClient)
             : base(httpClient)
