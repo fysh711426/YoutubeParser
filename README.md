@@ -95,11 +95,19 @@ var communitys = await youtube.Channel
     .ToListAsync();
 ```
 
+#### Get Video Comments  
+
+```C#
+var comments = await youtube.Video
+    .GetCommentsAsync(videoId)
+    .ToListAsync();
+```
+
 ---  
 
-### Parameters  
+### Filter  
 
-You can use parameters to filter videos in the video list.  
+You can use parameters to filter video list.  
 
 * VideoType 
 
@@ -148,10 +156,14 @@ var inLastMonth = await youtube.Channel
 The `Break` method leaves loop when the condition is true, use it can prevent requests wasted.  
 
 ```C#
-await foreach(var item in source)
+public static async IAsyncEnumerable<T> Break<T>(
+    this IAsyncEnumerable<T> source, Func<T, bool> predicate)
 {
-    if (predicate(item))
-        break;
-    yield return item;
+    await foreach(var item in source)
+    {
+        if (predicate(item))
+            break;
+        yield return item;
+    }
 }
 ```
