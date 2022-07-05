@@ -1,8 +1,6 @@
-﻿using System.Globalization;
-using YoutubeParser;
-using YoutubeParser.ChannelVideos;
-using YoutubeParser.Commons;
+﻿using YoutubeParser;
 using YoutubeParser.Extensions;
+using YoutubeParser.Shares;
 using YoutubeParser.Utils;
 
 namespace Example
@@ -13,6 +11,7 @@ namespace Example
         {
             var videoId = "VideoUrl or VideoId";
             var channelId = "ChannelUrl or ChannelId";
+            var communityId = "CommunityUrl or CommunityId";
 
             var youtube = new YoutubeClient();
 
@@ -21,6 +20,9 @@ namespace Example
 
             // Get Channel
             var channel = await youtube.Channel.GetAsync(channelId);
+
+            // Get Community
+            var community = await youtube.Community.GetAsync(communityId);
 
             // NET45 or NET46
             var videoList = await youtube
@@ -40,18 +42,28 @@ namespace Example
                 .ToListAsync();
 
             // Get Live Streams Videos
-            var liveStreams = youtube.Channel
+            var liveStreams = await youtube.Channel
                 .GetLiveAsync(channelId)
                 .ToListAsync();
 
             // Get Upcoming Live Streams Videos
-            var upcomingLiveStreams = youtube.Channel
+            var upcomingLiveStreams = await youtube.Channel
                 .GetUpcomingLiveAsync(channelId)
                 .ToListAsync();
 
             // Get Channel Communitys
-            var communitys = youtube.Channel
+            var communitys = await youtube.Channel
                 .GetCommunitysAsync(channelId)
+                .ToListAsync();
+
+            // Get Video Comments
+            var videoComments = await youtube.Video
+                .GetCommentsAsync(videoId)
+                .ToListAsync();
+
+            // Get Community Comments
+            var communityComments = await youtube.Community
+                .GetCommentsAsync(communityId)
                 .ToListAsync();
 
             // Get all past live streams

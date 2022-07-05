@@ -98,8 +98,16 @@ var communitys = await youtube.Channel
 #### Get Video Comments  
 
 ```C#
-var comments = await youtube.Video
+var videoComments = await youtube.Video
     .GetCommentsAsync(videoId)
+    .ToListAsync();
+```
+
+#### Get Community Comments  
+
+```C#
+var communityComments = await youtube.Community
+    .GetCommentsAsync(communityId)
     .ToListAsync();
 ```
 
