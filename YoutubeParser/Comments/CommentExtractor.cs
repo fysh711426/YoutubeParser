@@ -62,7 +62,7 @@ namespace YoutubeParser.Comments
         );
 
         public bool IsPinned() => Memo.Cache(this, () =>
-            TryGetComment()?["pinnedCommentBadge"]?.Value<bool>() ?? false
+            TryGetComment()?["pinnedCommentBadge"] != null
         );
 
         public long GetReplyCount() => Memo.Cache(this, () =>

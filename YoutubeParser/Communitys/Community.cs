@@ -15,7 +15,7 @@ namespace YoutubeParser.Communitys
         public long PublishedTimeSeconds { get; set; }
         public long LikeCount { get; set; }
         public string VoteStatus { get; set; } = "";
-        public string PollStatus { get; set; } = "";
+        public long? ReplyCount { get; set; }
         public string ReplyUrl => $"https://www.youtube.com/post/{PostId}";
     }
 }

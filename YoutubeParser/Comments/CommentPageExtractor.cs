@@ -16,8 +16,18 @@ namespace YoutubeParser.Comments
             new YoutubePageExtractor(_html).TryGetInitialData()
         );
 
-        private JToken? TryGetContents() => Memo.Cache(this, () =>
+        private JToken? TryGetVideoContents() => Memo.Cache(this, () =>
             TryGetInitialData()?["contents"]?["twoColumnWatchNextResults"]?["results"]?["results"]?["contents"]
+        );
+
+        private JToken? TryGetCommunityContents() => Memo.Cache(this, () =>
+            TryGetInitialData()?["contents"]?["twoColumnBrowseResultsRenderer"]?["tabs"]?.Values<JObject>()?
+                .Where(it => it?["tabRenderer"]?["selected"]?.Value<bool>() == true)
+                .FirstOrDefault()?["tabRenderer"]?["content"]?["sectionListRenderer"]?["contents"]
+        );
+
+        public JToken? TryGetContents() => Memo.Cache(this, () =>
+            TryGetVideoContents() ?? TryGetCommunityContents()
         );
 
         public string? TryGetPageContinuation() => Memo.Cache(this, () =>

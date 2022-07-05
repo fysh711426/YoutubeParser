@@ -5,10 +5,11 @@ using System.Net.Http;
 using System.Text;
 using System.Threading.Tasks;
 using YoutubeParser.Comments;
+using YoutubeParser.Shares;
 
-namespace YoutubeParser.Videos
+namespace YoutubeParser.Communitys
 {
-    public partial class YoutubeVideoParser
+    public partial class YoutubeCommunityParser
     {
         // ----- GetComments -----
         private string? _continuationComment;
@@ -35,9 +36,9 @@ namespace YoutubeParser.Videos
             };
         }
 
-        public async Task<List<Comment>> GetCommentsListAsync(string urlOrVideoId)
+        public async Task<List<Comment>> GetCommentsListAsync(string urlOrCommunityId)
         {
-            var url = $"{GetVideoUrl(urlOrVideoId)}";
+            var url = $"{GetCommunityUrl(urlOrCommunityId)}";
             using var request = new HttpRequestMessage(HttpMethod.Get, url);
             SetDefaultHttpRequest(request);
             using var response = await _httpClient.SendAsync(request, HttpCompletionOption.ResponseHeadersRead);
@@ -57,7 +58,7 @@ namespace YoutubeParser.Videos
             if (_continuationComment == null)
                 return null;
 
-            var apiUrl = $"https://www.youtube.com/youtubei/v1/next?key={apiKey}";
+            var apiUrl = $"https://www.youtube.com/youtubei/v1/browse?key={apiKey}";
             var client = _httpClient;
 
             using var request = new HttpRequestMessage(HttpMethod.Post, apiUrl);

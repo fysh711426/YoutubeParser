@@ -38,8 +38,8 @@ namespace YoutubeParser.Communitys
             _content["voteCount"]?["accessibility"]?["accessibilityData"]?["label"]?.Value<string>()?.GetCountValue() ?? 0
         );
 
-        public string GetPollStatus() => Memo.Cache(this, () =>
-            _content["pollStatus"]?.Value<string>() ?? ""
+        public long GetReplyCount() => Memo.Cache(this, () =>
+            _content["actionButtons"]?["commentActionButtonsRenderer"]?["replyButton"]?["buttonRenderer"]?["text"]?["simpleText"]?.Value<string>()?.GetCountValue() ?? 0
         );
 
         public string GetVoteStatus() => Memo.Cache(this, () =>
