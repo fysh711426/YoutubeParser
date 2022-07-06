@@ -8,7 +8,7 @@
     <Description>This is a library for parsing youtube pages.
 It focus more on channel than other libraries, for example you can use it to get channel videos, live videos, upcoming videos, or community articles.
     </Description>
-    <Version>1.0.3</Version>
+    <Version>1.0.4</Version>
     <PackageProjectUrl>https://github.com/fysh711426/YoutubeParser</PackageProjectUrl>
     <PackageLicenseExpression>MIT</PackageLicenseExpression>
     <PackageLicenseFile></PackageLicenseFile>
