@@ -14,6 +14,16 @@ PM> Install-Package YoutubeParser
 
 ---  
 
+### IAsyncEnumerable  
+
+```
+PM> Install-Package System.Linq.Async
+```  
+
+> If you want to use LINQ on IAsyncEnumerable you need to install this package.  
+
+---  
+
 ### Example  
 
 `videoId` or `channelId` can use url or id.  
@@ -31,13 +41,9 @@ var channel = await youtube.Channel.GetAsync(channelId);
 var community = await youtube.Community.GetAsync(communityId);
 ```
 
+---  
+
 #### Get Channel Videos  
-
-> If you want to use LINQ on IAsyncEnumerable you need to install this package.  
-
-```
-PM> Install-Package System.Linq.Async
-```  
 
 ```C#
 var videos = await youtube.Channel
@@ -71,6 +77,8 @@ while (true)
 }
 ```
 
+---  
+
 #### Get Live Streams Videos  
 
 ```C#
@@ -87,6 +95,8 @@ var upcomingLiveStreams = await youtube.Channel
     .ToListAsync();
 ```
 
+---  
+
 #### Get Channel Communitys  
 
 ```C#
@@ -94,6 +104,8 @@ var communitys = await youtube.Channel
     .GetCommunitysAsync(channelId)
     .ToListAsync();
 ```
+
+---  
 
 #### Get Video Comments  
 
@@ -110,6 +122,8 @@ var communityComments = await youtube.Community
     .GetCommentsAsync(communityId)
     .ToListAsync();
 ```
+
+---  
 
 #### Get Video TopChats  
 
@@ -129,24 +143,9 @@ var liveChats = await youtube.Video
 
 ---  
 
-### Filter  
+### Parameters  
 
-You can use parameters to filter video list.  
-
-* VideoType 
-
- Type    | Description 
----------|-------------------
- Video   | Upload video
- Stream  | Live stream video
-
-* VideoStatus  
-
-Status    | Description
-----------|------------------
- Default  | Streamed or Premiered or Upload video
- Live     | Streaming or Premiere in progress
- Upcoming | Scheduled or Premieres
+* You can use parameters to filter video list.  
 
 #### Get all past live streams  
 
@@ -159,6 +158,23 @@ var pastLiveStreams = await youtube.Channel
     .ToListAsync();
 ```
 
+* VideoType 
+
+ Type    | Description 
+---------|-------------------
+ Video   | Upload video
+ Stream  | Live stream video
+
+* VideoStatus  
+
+ Status   | Description
+----------|------------------
+ Default  | Streamed or Premiered or Upload video
+ Live     | Streaming or Premiere in progress
+ Upcoming | Scheduled or Premieres
+
+---  
+
 #### Get shorts videos  
 
 ```C#
@@ -167,6 +183,8 @@ var shortsVideos = await youtube.Channel
     .Where(it => it.IsShorts)
     .ToListAsync();
 ```
+
+---  
 
 #### Get videos in last month  
 
@@ -192,6 +210,8 @@ public static async IAsyncEnumerable<T> Break<T>(
 }
 ```
 
+---  
+
 #### Get super thanks  
 
 ```C#
@@ -200,6 +220,8 @@ var superThanks = await youtube.Video
     .Where(it => it.CommentType == CommentType.SuperThanks)
     .ToListAsync();
 ```
+
+---  
 
 #### Get super chats  
 
@@ -218,3 +240,13 @@ var giftChats = await youtube.Video
     .Where(it => it.LiveChatType == LiveChatType.Gift)
     .ToListAsync();
 ```
+
+* LiveChatType  
+
+ Type       | Description
+------------|------------------
+ Pinned     | Pinned chat
+ Text       | Message chat
+ SuperChat  | SuperChat or SuperSticker
+ Gift       | Member gift
+ Membership | Member join or Member chat
