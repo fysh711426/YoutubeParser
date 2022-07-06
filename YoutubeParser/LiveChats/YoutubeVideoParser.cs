@@ -21,7 +21,8 @@ namespace YoutubeParser.Videos
             var extractor = new LiveChatExtractor(content);
             return new LiveChat
             {
-                LiveChatType = extractor.GetLiveChatType(),
+                _liveChatType = extractor.GetLiveChatType(),
+                LiveChatType = (LiveChatType)extractor.GetLiveChatType(),
                 LiveChatId = extractor.GetLiveChatId(),
                 Message = extractor.GetMessage(),
                 AuthorTitle = extractor.GetAuthorTitle(),
@@ -33,7 +34,8 @@ namespace YoutubeParser.Videos
                 HeaderSubText = extractor.GetHeaderSubText(),
                 Amount = extractor.GetAmount(),
                 AmountColor = extractor.TryGetAmountColor(),
-                Json = extractor.GetJson()
+                IsPinned = extractor.IsPinned(),
+                //Json = extractor.GetJson()
             };
         }
 
@@ -55,7 +57,7 @@ namespace YoutubeParser.Videos
             return liveChats ?? new List<LiveChat>();
         }
 
-        private Dictionary<string, bool> _liveChatDict = new();
+        private Dictionary<string, LiveChat> _liveChatDict = new();
         public async Task<List<LiveChat>?> GetNextLiveChatsListAsync()
         {
             if (_continuationLiveChat == null)
@@ -83,12 +85,28 @@ namespace YoutubeParser.Videos
             foreach (var item in liveChatItems)
             {
                 var liveChat = MapLiveChat(item);
-                if (liveChat.LiveChatType != LiveChatType.System &&
-                    liveChat.LiveChatType != LiveChatType.Placeholder)
+                if (liveChat._liveChatType != _LiveChatType.System &&
+                    liveChat._liveChatType != _LiveChatType.Placeholder)
                 {
-                    if (!_liveChatDict.ContainsKey(liveChat.LiveChatId))
-                        liveChats.Add(liveChat);
-                    _liveChatDict[liveChat.LiveChatId] = true;
+                    if (_liveChatDict.TryGetValue(liveChat.LiveChatId, out var prev))
+                    {
+                        if (!prev.IsPinned && liveChat.IsPinned)
+                        {
+                            if (liveChats.IndexOf(prev) > -1)
+                            {
+                                prev.IsPinned = true;
+                            }
+                            else
+                            {
+                                // liveChat pinned may be repeat
+                                liveChats.Add(liveChat);
+                                _liveChatDict[liveChat.LiveChatId] = liveChat;
+                            }
+                        };
+                        continue;
+                    }
+                    liveChats.Add(liveChat);
+                    _liveChatDict[liveChat.LiveChatId] = liveChat;
                 }
             }
             _continuationLiveChat = extractor.TryGetContinuation();

@@ -74,15 +74,18 @@ namespace YoutubeParser.Comments
             TryGetChatItem()?["liveChatPlaceholderItemRenderer"]
         );
 
-        public LiveChatType GetLiveChatType() => Memo.Cache(this, () =>
-            TryGetBanner() != null ? LiveChatType.Banner :
-            TryGetChatViewerEngagement() != null ? LiveChatType.System :
-            TryGetChatPlaceholder() != null ? LiveChatType.Placeholder :
-            TryGetChatTextMessage() != null ? LiveChatType.Text :
-            TryGetChatMembership() != null ? LiveChatType.Membership :
-            TryGetChatPaid() != null ? LiveChatType.SuperChat :
-            TryGetChatGift() != null ? LiveChatType.Gift :
-            LiveChatType.Unknow
+        public _LiveChatType GetLiveChatType() => Memo.Cache(this, () =>
+            TryGetChatViewerEngagement() != null ? _LiveChatType.System :
+            TryGetChatPlaceholder() != null ? _LiveChatType.Placeholder :
+            TryGetChatTextMessage() != null ? _LiveChatType.Text :
+            TryGetChatMembership() != null ? _LiveChatType.Membership :
+            TryGetChatPaid() != null ? _LiveChatType.SuperChat :
+            TryGetChatGift() != null ? _LiveChatType.Gift :
+            _LiveChatType.Unknow
+        );
+
+        public bool IsPinned() => Memo.Cache(this, () =>
+            TryGetBanner() != null
         );
 
         private JToken? TryGetChatRenderer() => Memo.Cache(this, () =>

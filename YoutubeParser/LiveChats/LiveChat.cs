@@ -9,6 +9,7 @@ namespace YoutubeParser.LiveChats
 {
     public class LiveChat
     {
+        internal _LiveChatType _liveChatType { get; set; }
         public LiveChatType LiveChatType { get; set; }
         public string LiveChatId { get; set; } = "";
         public string Message { get; set; } = "";
@@ -21,6 +22,7 @@ namespace YoutubeParser.LiveChats
         public IReadOnlyList<Thumbnail> AuthorThumbnails { get; set; } = new List<Thumbnail>();
         public string TimestampText { get; set; } = "";
         public long TimestampUsec { get; set; }
-        public string Json { get; set; } = "";
+        public bool IsPinned { get; set; }
+        //public string Json { get; set; } = "";
     }
 }

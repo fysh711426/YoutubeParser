@@ -191,14 +191,14 @@ var shortsVideos = await youtube.Channel
 ```C#
 var inLastMonth = await youtube.Channel
     .GetVideosAsync(channelId)
-    .Break(it => it.PublishedTimeSeconds >= TimeSeconds.Month)
+    .BreakOn(it => it.PublishedTimeSeconds >= TimeSeconds.Month)
     .ToListAsync();
 ```
 
-The `Break` method leaves loop when the condition is true, use it can prevent requests wasted.  
+The `BreakOn` method leaves loop when the condition is true, use it can prevent requests wasted.  
 
 ```C#
-public static async IAsyncEnumerable<T> Break<T>(
+public static async IAsyncEnumerable<T> BreakOn<T>(
     this IAsyncEnumerable<T> source, Func<T, bool> predicate)
 {
     await foreach(var item in source)
@@ -245,7 +245,6 @@ var giftChats = await youtube.Video
 
  Type       | Description
 ------------|------------------
- Pinned     | Pinned chat
  Text       | Message chat
  SuperChat  | SuperChat or SuperSticker
  Gift       | Member gift

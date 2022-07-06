@@ -34,7 +34,7 @@ namespace YoutubeParser.Videos
             return liveChats ?? new List<LiveChat>();
         }
 
-        private Dictionary<string, bool> _topLiveChatDict = new();
+        private Dictionary<string, LiveChat> _topLiveChatDict = new();
         public async Task<List<LiveChat>?> GetNextTopChatsListAsync()
         {
             if (_continuationTopLiveChat == null)
@@ -62,12 +62,28 @@ namespace YoutubeParser.Videos
             foreach (var item in liveChatItems)
             {
                 var liveChat = MapLiveChat(item);
-                if (liveChat.LiveChatType != LiveChatType.System &&
-                    liveChat.LiveChatType != LiveChatType.Placeholder)
+                if (liveChat._liveChatType != _LiveChatType.System &&
+                    liveChat._liveChatType != _LiveChatType.Placeholder)
                 {
-                    if (!_topLiveChatDict.ContainsKey(liveChat.LiveChatId))
-                        liveChats.Add(MapLiveChat(item));
-                    _topLiveChatDict[liveChat.LiveChatId] = true;
+                    if (_topLiveChatDict.TryGetValue(liveChat.LiveChatId, out var prev))
+                    {
+                        if (!prev.IsPinned && liveChat.IsPinned)
+                        {
+                            if (liveChats.IndexOf(prev) > -1)
+                            {
+                                prev.IsPinned = true;
+                            }
+                            else
+                            {
+                                // liveChat pinned may be repeat
+                                liveChats.Add(liveChat);
+                                _topLiveChatDict[liveChat.LiveChatId] = liveChat;
+                            }
+                        };
+                        continue;
+                    }
+                    liveChats.Add(liveChat);
+                    _topLiveChatDict[liveChat.LiveChatId] = liveChat;
                 }
             }
             _continuationTopLiveChat = extractor.TryGetContinuation();
