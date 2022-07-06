@@ -80,7 +80,7 @@ namespace YoutubeParser.Comments
             TryGetChatPlaceholder() != null ? LiveChatType.Placeholder :
             TryGetChatTextMessage() != null ? LiveChatType.Text :
             TryGetChatMembership() != null ? LiveChatType.Membership :
-            TryGetChatPaid() != null ? LiveChatType.Paid :
+            TryGetChatPaid() != null ? LiveChatType.SuperChat :
             TryGetChatGift() != null ? LiveChatType.Gift :
             LiveChatType.Unknow
         );
@@ -118,7 +118,7 @@ namespace YoutubeParser.Comments
             TryGetChatRenderer()?["purchaseAmountText"]?["simpleText"]?.Value<string>() ?? ""
         );
 
-        public string GetAmountColorText() => Memo.Cache(this, () =>
+        private string GetAmountColorText() => Memo.Cache(this, () =>
             GetAmount() == "" ? "" :
                 TryGetChatRenderer()?["headerBackgroundColor"]?.Value<string>() ??
                 TryGetChatRenderer()?["moneyChipBackgroundColor"]?.Value<string>() ?? ""

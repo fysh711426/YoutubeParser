@@ -69,6 +69,22 @@ namespace YoutubeParser.Comments
             TryGetComment()?["replyCount"]?.Value<long>() ?? 0
         );
 
+        public string GetAmount() => Memo.Cache(this, () =>
+            TryGetComment()?["paidCommentChipRenderer"]?["pdgCommentChipRenderer"]?["chipText"]?["simpleText"]?.Value<string>() ?? ""
+        );
+
+        private string GetAmountColorText() => Memo.Cache(this, () =>
+            TryGetComment()?["paidCommentChipRenderer"]?["pdgCommentChipRenderer"]?["chipColorPalette"]?["backgroundColor"]?.Value<long?>()?.ToString() ?? ""
+        );
+
+        public AmountColor? TryGetAmountColor() => Memo.Cache(this, () =>
+            GetAmountColorText().TryGetAmountColor()
+        );
+
+        public CommentType GetCommentType() => Memo.Cache(this, () =>
+            GetAmount() == "" ? CommentType.Text : CommentType.SuperThanks
+        );
+
         public string? TryGetReplyContinuation() => Memo.Cache(this, () =>
             _content["replies"]?["commentRepliesRenderer"]?["contents"]?.Values<JObject>()
                 .FirstOrDefault()?["continuationItemRenderer"]?["continuationEndpoint"]?["continuationCommand"]?["token"]?.Value<string>()

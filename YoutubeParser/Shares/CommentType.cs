@@ -6,15 +6,9 @@ using System.Threading.Tasks;
 
 namespace YoutubeParser.Shares
 {
-    public enum LiveChatType
+    public enum CommentType
     {
-        Unknow,
-        System,
-        Placeholder,
-        Banner,
         Text,
-        SuperChat,
-        Gift,
-        Membership
+        SuperThanks
     }
 }

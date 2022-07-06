@@ -9,6 +9,7 @@ namespace YoutubeParser.Comments
 {
     public class Comment
     {
+        public CommentType CommentType { get; set; }
         public string CommentId { get; set; } = "";
         public string Content { get; set; } = "";
         public bool IsModerated { get; set; }
@@ -23,5 +24,7 @@ namespace YoutubeParser.Comments
         public long ReplyCount { get; set; }
         public List<Comment> Replies { get; set; } = new List<Comment>();
         public string? ReplyContinuation { get; set; }
+        public string Amount { get; set; } = "";
+        public AmountColor? AmountColor { get; set; }
     }
 }

@@ -66,6 +66,16 @@ namespace Example
                 .GetCommentsAsync(communityId)
                 .ToListAsync();
 
+            // Get Video TopChats
+            var topChats = await youtube.Video
+                .GetTopChatsAsync(videoId)
+                .ToListAsync();
+
+            // Get Video LiveChats
+            var liveChats = await youtube.Video
+                .GetLiveChatsAsync(videoId)
+                .ToListAsync();
+
             // Get all past live streams
             var pastLiveStreams = await youtube.Channel
                 .GetVideosAsync(channelId)
@@ -80,10 +90,28 @@ namespace Example
                 .Where(it => it.IsShorts)
                 .ToListAsync();
 
-            // Get Videos in last month
+            // Get videos in last month
             var inLastMonth = await youtube.Channel
                 .GetVideosAsync(channelId)
                 .Break(it => it.PublishedTimeSeconds >= TimeSeconds.Month)
+                .ToListAsync();
+
+            // Get super thanks
+            var superThanks = await youtube.Video
+                .GetCommentsAsync(videoId)
+                .Where(it => it.CommentType == CommentType.SuperThanks)
+                .ToListAsync();
+
+            // Get super chats
+            var superChats = await youtube.Video
+                .GetTopChatsAsync(videoId)
+                .Where(it => it.LiveChatType == LiveChatType.SuperChat)
+                .ToListAsync();
+
+            // Get gift chats
+            var giftChats = await youtube.Video
+                .GetTopChatsAsync(videoId)
+                .Where(it => it.LiveChatType == LiveChatType.Gift)
                 .ToListAsync();
         }
     }

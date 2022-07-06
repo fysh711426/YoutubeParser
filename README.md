@@ -192,12 +192,21 @@ public static async IAsyncEnumerable<T> Break<T>(
 }
 ```
 
+#### Get super thanks  
+
+```C#
+var superThanks = await youtube.Video
+    .GetCommentsAsync(videoId)
+    .Where(it => it.CommentType == CommentType.SuperThanks)
+    .ToListAsync();
+```
+
 #### Get super chats  
 
 ```C#
 var superChats = await youtube.Video
     .GetTopChatsAsync(videoId)
-    .Where(it => it.LiveChatType == LiveChatType.Paid)
+    .Where(it => it.LiveChatType == LiveChatType.SuperChat)
     .ToListAsync();
 ```
 
