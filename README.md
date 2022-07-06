@@ -111,6 +111,22 @@ var communityComments = await youtube.Community
     .ToListAsync();
 ```
 
+#### Get Video TopChats  
+
+```C#
+var topChats = await youtube.Video
+    .GetTopChatsAsync(videoId)
+    .ToListAsync();
+```
+
+#### Get Video LiveChats  
+
+```C#
+var liveChats = await youtube.Video
+    .GetLiveChatsAsync(videoId)
+    .ToListAsync();
+```
+
 ---  
 
 ### Filter  
@@ -174,4 +190,22 @@ public static async IAsyncEnumerable<T> Break<T>(
         yield return item;
     }
 }
+```
+
+#### Get super chats  
+
+```C#
+var superChats = await youtube.Video
+    .GetTopChatsAsync(videoId)
+    .Where(it => it.LiveChatType == LiveChatType.Paid)
+    .ToListAsync();
+```
+
+#### Get gift chats
+
+```C#
+var giftChats = await youtube.Video
+    .GetTopChatsAsync(videoId)
+    .Where(it => it.LiveChatType == LiveChatType.Gift)
+    .ToListAsync();
 ```

@@ -5,6 +5,7 @@ using System.Linq;
 using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
+using YoutubeParser.Shares;
 
 namespace YoutubeParser.Extensions
 {
@@ -40,7 +41,7 @@ namespace YoutubeParser.Extensions
 
         public static DateTime? TryGetJoinedDate(this string joinedDate)
         {
-            return DateTime.TryParse(joinedDate, DateTimeFormatInfo.InvariantInfo, 
+            return DateTime.TryParse(joinedDate, DateTimeFormatInfo.InvariantInfo,
                 DateTimeStyles.None, out var result)
                     ? result : null;
         }
@@ -76,6 +77,25 @@ namespace YoutubeParser.Extensions
                 seconds = val * 1 * 60 * 60 * 24 * 365;
 
             return seconds;
+        }
+
+        public static AmountColor? TryGetAmountColor(this string color)
+        {
+            if (color == "4280191205" || color == "4279592384")
+                return AmountColor.DarkBlue;
+            if (color == "4278237396" || color == "4278248959")
+                return AmountColor.Blue;
+            if (color == "4278239141" || color == "4280150454")
+                return AmountColor.Green;
+            if (color == "4294947584" || color == "4294953512")
+                return AmountColor.Yellow;
+            if (color == "4293284096" || color == "4294278144")
+                return AmountColor.Orange;
+            if (color == "4290910299" || color == "4293467747")
+                return AmountColor.Purple;
+            if (color == "4291821568" || color == "4293271831")
+                return AmountColor.Red;
+            return null;
         }
     }
 }
