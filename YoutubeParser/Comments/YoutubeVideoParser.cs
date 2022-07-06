@@ -31,10 +31,11 @@ namespace YoutubeParser.Videos
                 AuthorIsChannelOwner = extractor.GetAuthorIsChannelOwner(),
                 IsPinned = extractor.IsPinned(),
                 ReplyCount = extractor.GetReplyCount(),
-                ReplyContinuation = extractor.TryGetReplyContinuation(),
                 CommentType = extractor.GetCommentType(),
                 Amount = extractor.GetAmount(),
-                AmountColor = extractor.TryGetAmountColor()
+                AmountColor = extractor.TryGetAmountColor(),
+                _continuation = extractor.TryGetReplyContinuation(),
+                _context = _contextComment
             };
         }
 

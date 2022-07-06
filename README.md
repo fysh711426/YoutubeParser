@@ -123,6 +123,23 @@ var communityComments = await youtube.Community
     .ToListAsync();
 ```
 
+#### Get Comment Replies  
+
+```C#
+var comments = await youtube.Video
+    .GetCommentsAsync(videoId)
+    .ToListAsync();
+foreach (var comment in comments)
+{
+    if (comment.ReplyCount > 0)
+    {
+        comment.Replies = await youtube.Comment
+            .GetRepliesAsync(comment)
+            .ToListAsync();
+    }
+}
+```
+
 ---  
 
 #### Get Video TopChats  

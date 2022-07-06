@@ -77,5 +77,29 @@ namespace YoutubeParser.Comments
                 _TryGetContinuation(content);
             }
         }
+
+        public string? TryGetReplyContinuation() => _TryGetReplyContinuation();
+
+        private string? _TryGetReplyContinuation(JObject? content = null) => Memo.Cache(this, () =>
+            content?["continuationItemRenderer"]?["button"]?["buttonRenderer"]?["command"]?["continuationCommand"]?["token"]?.Value<string>()
+        );
+
+        public IEnumerable<JToken> GetReplyItemsFromNext()
+        {
+            var contents = GetCommentContentsFromNext();
+            foreach (var content in contents)
+            {
+                if (content?.ContainsKey("commentRenderer") == true)
+                {
+                    var comment = content;
+                    if (comment != null)
+                    {
+                        yield return comment;
+                    }
+                    continue;
+                }
+                _TryGetReplyContinuation(content);
+            }
+        }
     }
 }

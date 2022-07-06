@@ -66,6 +66,20 @@ namespace Example
                 .GetCommentsAsync(communityId)
                 .ToListAsync();
 
+            // Get Comment Replies
+            var comments = await youtube.Video
+                .GetCommentsAsync(videoId)
+                .ToListAsync();
+            foreach (var comment in comments)
+            {
+                if (comment.ReplyCount > 0)
+                {
+                    comment.Replies = await youtube.Comment
+                        .GetRepliesAsync(comment)
+                        .ToListAsync();
+                }
+            }
+
             // Get Video TopChats
             var topChats = await youtube.Video
                 .GetTopChatsAsync(videoId)
@@ -93,7 +107,7 @@ namespace Example
             // Get videos in last month
             var inLastMonth = await youtube.Channel
                 .GetVideosAsync(channelId)
-                .Break(it => it.PublishedTimeSeconds >= TimeSeconds.Month)
+                .BreakOn(it => it.PublishedTimeSeconds >= TimeSeconds.Month)
                 .ToListAsync();
 
             // Get super thanks
@@ -101,7 +115,7 @@ namespace Example
                 .GetCommentsAsync(videoId)
                 .Where(it => it.CommentType == CommentType.SuperThanks)
                 .ToListAsync();
-
+            
             // Get super chats
             var superChats = await youtube.Video
                 .GetTopChatsAsync(videoId)

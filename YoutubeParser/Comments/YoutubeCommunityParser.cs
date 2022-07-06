@@ -31,7 +31,8 @@ namespace YoutubeParser.Communitys
                 AuthorIsChannelOwner = extractor.GetAuthorIsChannelOwner(),
                 IsPinned = extractor.IsPinned(),
                 ReplyCount = extractor.GetReplyCount(),
-                ReplyContinuation = extractor.TryGetReplyContinuation()
+                _continuation = extractor.TryGetReplyContinuation(),
+                _context = _contextComment
             };
         }
 

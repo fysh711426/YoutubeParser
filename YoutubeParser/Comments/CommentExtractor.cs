@@ -14,8 +14,12 @@ namespace YoutubeParser.Comments
 
         public CommentExtractor(JToken content) => _content = content;
 
+        private JToken? TryGetCommentReply() => Memo.Cache(this, () =>
+            _content["commentRenderer"]
+        );
+
         private JToken? TryGetComment() => Memo.Cache(this, () =>
-            _content["comment"]?["commentRenderer"]
+            _content["comment"]?["commentRenderer"] ?? TryGetCommentReply()
         );
 
         public string GetCommentId() => Memo.Cache(this, () =>
