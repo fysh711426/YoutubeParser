@@ -52,7 +52,7 @@ namespace YoutubeParser.Comments
             if (_continuationReply == null)
                 return null;
 
-            var apiUrl = $"https://www.youtube.com/youtubei/v1/next?key={apiKey}";
+            var apiUrl = $"https://www.youtube.com/youtubei/v1/browse?key={apiKey}";
             var client = _httpClient;
 
             using var request = new HttpRequestMessage(HttpMethod.Post, apiUrl);
