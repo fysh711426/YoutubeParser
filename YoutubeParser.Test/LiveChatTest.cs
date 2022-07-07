@@ -29,17 +29,25 @@ namespace YoutubeParser.Test
                 .Where(it => it.LiveChatType == LiveChatType.SuperChat)
                 .ToList();
 
+            var first = superChats.First();
+            var darkBlue = superChats.Skip(11).First();
+            var lightBlue = superChats.Skip(10).First();
+            var green = superChats.Skip(8).First();
+            var orange = superChats.Skip(3).First();
+            var purple = superChats.Skip(0).First();
+            var red = superChats.Skip(2).First();
+
             Assert.IsNotNull(continuation);
             Assert.AreEqual(superChats.Count, 18);
-            Assert.AreNotEqual(superChats[0].LiveChatId, "");
-            Assert.AreNotEqual(superChats[0].AuthorChannelId, "");
-            Assert.AreNotEqual(superChats[0].TimestampText, "");
-            Assert.AreEqual(superChats[11].AmountColor, AmountColor.DarkBlue);
-            Assert.AreEqual(superChats[10].AmountColor, AmountColor.Blue);
-            Assert.AreEqual(superChats[8].AmountColor, AmountColor.Green);
-            Assert.AreEqual(superChats[3].AmountColor, AmountColor.Orange);
-            Assert.AreEqual(superChats[0].AmountColor, AmountColor.Purple);
-            Assert.AreEqual(superChats[2].AmountColor, AmountColor.Red);
+            Assert.AreNotEqual(first.LiveChatId, "");
+            Assert.AreNotEqual(first.AuthorChannelId, "");
+            Assert.AreNotEqual(first.TimestampText, "");
+            Assert.AreEqual(darkBlue.AmountColor, AmountColor.DarkBlue);
+            Assert.AreEqual(lightBlue.AmountColor, AmountColor.LightBlue);
+            Assert.AreEqual(green.AmountColor, AmountColor.Green);
+            Assert.AreEqual(orange.AmountColor, AmountColor.Orange);
+            Assert.AreEqual(purple.AmountColor, AmountColor.Purple);
+            Assert.AreEqual(red.AmountColor, AmountColor.Red);
         }
 
         [TestMethod]
@@ -85,13 +93,16 @@ namespace YoutubeParser.Test
                 .Where(it => it.LiveChatType == LiveChatType.Membership)
                 .ToList();
 
+            var first = memberChats.First();
+            var other = memberChats.Skip(4).First();
+
             Assert.IsNotNull(continuation);
             Assert.AreEqual(memberChats.Count, 32);
-            Assert.AreNotEqual(memberChats[0].LiveChatId, "");
-            Assert.AreNotEqual(memberChats[0].AuthorChannelId, "");
-            Assert.AreNotEqual(memberChats[0].TimestampText, "");
-            Assert.IsTrue(memberChats[0].HeaderText != "");
-            Assert.IsTrue(memberChats[4].HeaderSubText.Contains("Welcome to"));
+            Assert.AreNotEqual(first.LiveChatId, "");
+            Assert.AreNotEqual(first.AuthorChannelId, "");
+            Assert.AreNotEqual(first.TimestampText, "");
+            Assert.IsTrue(first.HeaderText != "");
+            Assert.IsTrue(other.HeaderSubText.Contains("Welcome to"));
         }
 
         [TestMethod]
@@ -108,11 +119,13 @@ namespace YoutubeParser.Test
                 .Where(it => it.IsPinned)
                 .ToList();
 
+            var first = pinnedChats.First();
+
             Assert.IsNotNull(continuation);
             Assert.AreEqual(pinnedChats.Count, 1);
-            Assert.AreNotEqual(pinnedChats[0].LiveChatId, "");
-            Assert.AreNotEqual(pinnedChats[0].AuthorChannelId, "");
-            Assert.AreNotEqual(pinnedChats[0].TimestampText, "");
+            Assert.AreNotEqual(first.LiveChatId, "");
+            Assert.AreNotEqual(first.AuthorChannelId, "");
+            Assert.AreNotEqual(first.TimestampText, "");
         }
 
         internal List<LiveChat> MapList(List<JToken> liveChatItems)
@@ -124,7 +137,7 @@ namespace YoutubeParser.Test
                 var liveChat = Map(item);
                 if (liveChat._liveChatType == _LiveChatType.Unknow)
                 {
-                    var x = 0;
+                    throw new Exception("LiveChatType unknow.");
                 }
                 if (liveChat._liveChatType != _LiveChatType.System &&
                     liveChat._liveChatType != _LiveChatType.Placeholder)

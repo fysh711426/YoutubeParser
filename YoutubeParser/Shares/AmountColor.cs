@@ -9,7 +9,7 @@ namespace YoutubeParser.Shares
     public enum AmountColor
     {
         DarkBlue,
-        Blue,
+        LightBlue,
         Green,
         Yellow,
         Orange,

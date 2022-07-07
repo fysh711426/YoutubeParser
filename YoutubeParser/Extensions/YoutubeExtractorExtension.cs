@@ -84,14 +84,14 @@ namespace YoutubeParser.Extensions
             if (color == "4280191205" || color == "4279592384")
                 return AmountColor.DarkBlue;
             if (color == "4278237396" || color == "4278248959")
-                return AmountColor.Blue;
+                return AmountColor.LightBlue;
             if (color == "4278239141" || color == "4280150454")
                 return AmountColor.Green;
-            if (color == "4294947584" || color == "4294953512")
+            if (color == "4294947584" || color == "4294953512" || color == "4294429264")
                 return AmountColor.Yellow;
             if (color == "4293284096" || color == "4294278144")
                 return AmountColor.Orange;
-            if (color == "4290910299" || color == "4293467747")
+            if (color == "4290910299" || color == "4293467747" || color == "4292230501")
                 return AmountColor.Purple;
             if (color == "4291821568" || color == "4293271831")
                 return AmountColor.Red;

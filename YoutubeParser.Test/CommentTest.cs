@@ -6,6 +6,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using YoutubeParser.Comments;
+using YoutubeParser.Shares;
 using YoutubeParser.Test.Utils;
 
 namespace YoutubeParser.Test
@@ -16,7 +17,35 @@ namespace YoutubeParser.Test
         [TestMethod]
         public void SuperThanks()
         {
+            var files = new string[]  
+            {
+                Path.Combine(TestFile.DirPath, "CommentTest_SuperThanksLightBlueYellow.txt"),
+                Path.Combine(TestFile.DirPath, "CommentTest_SuperThanksGreen.txt"),
+                Path.Combine(TestFile.DirPath, "CommentTest_SuperThanksPurple.txt")
+            };
 
+            var superThanks = new List<Comment>();
+            foreach(var file in files)
+            {
+                var json = File.ReadAllText(file);
+                var extractor = new CommentPageExtractor(json);
+                var commentItems = extractor.GetCommentItemsFromNext().ToList();
+                var comments = MapList(commentItems);
+                var superThank = comments.Where(it =>
+                    it.CommentType == CommentType.SuperThanks);
+                superThanks.AddRange(superThank);
+            }
+
+            var lightBlue = superThanks.Skip(1).First();
+            var green = superThanks.Skip(2).First();
+            var yellow = superThanks.Skip(0).First();
+            var purple = superThanks.Skip(3).First();
+
+            Assert.AreEqual(superThanks.Count, 4);
+            Assert.AreEqual(lightBlue.AmountColor, AmountColor.LightBlue);
+            Assert.AreEqual(green.AmountColor, AmountColor.Green);
+            Assert.AreEqual(yellow.AmountColor, AmountColor.Yellow);
+            Assert.AreEqual(purple.AmountColor, AmountColor.Purple);
         }
 
         [TestMethod]
