@@ -8,7 +8,7 @@ using YoutubeParser.Extensions;
 using YoutubeParser.Shares;
 using YoutubeParser.Utils;
 
-namespace YoutubeParser.Comments
+namespace YoutubeParser.LiveChats
 {
     internal class LiveChatExtractor
     {
@@ -26,7 +26,11 @@ namespace YoutubeParser.Comments
 
         private JToken? TryGetTickerSponsor() => Memo.Cache(this, () =>
             _content["actions"]?.FirstOrDefault()?["addLiveChatTickerItemAction"]?["item"]?
-                ["liveChatTickerSponsorItemRenderer"]?["showItemEndpoint"]?["showLiveChatItemEndpoint"]?["renderer"]
+                ["liveChatTickerSponsorItemRenderer"]
+        );
+
+        private JToken? TryGetTickerSponsorShowItem() => Memo.Cache(this, () =>
+            TryGetTickerSponsor()?["showItemEndpoint"]?["showLiveChatItemEndpoint"]?["renderer"]
         );
 
         private JToken? TryGetTickerPaid() => Memo.Cache(this, () =>
@@ -58,12 +62,25 @@ namespace YoutubeParser.Comments
 
         private JToken? TryGetChatMembership() => Memo.Cache(this, () =>
             TryGetChatItem()?["liveChatMembershipItemRenderer"] ??
-            TryGetTickerSponsor()?["liveChatMembershipItemRenderer"] ??
+            TryGetTickerSponsorShowItem()?["liveChatMembershipItemRenderer"] ??
             TryGetBanner()?["liveChatMembershipItemRenderer"]
         );
 
         private JToken? TryGetChatGift() => Memo.Cache(this, () =>
-            TryGetTickerSponsor()?["liveChatSponsorshipsGiftPurchaseAnnouncementRenderer"]?["header"]?["liveChatSponsorshipsHeaderRenderer"]?["showItemEndpoint"]?["showItemEndpoint"]
+            TryGetChatItem()?["liveChatSponsorshipsGiftPurchaseAnnouncementRenderer"] ??
+            TryGetTickerSponsorShowItem()?["liveChatSponsorshipsGiftPurchaseAnnouncementRenderer"] ??
+            TryGetChatItem()?["liveChatSponsorshipsGiftRedemptionAnnouncementRenderer"] ??
+            TryGetTickerSponsorShowItem()?["liveChatSponsorshipsGiftRedemptionAnnouncementRenderer"] ??
+            TryGetBanner()?["liveChatSponsorshipsGiftPurchaseAnnouncementRenderer"]
+        );
+
+        private JToken? TryGetChatGiftParent() => Memo.Cache(this, () =>
+            TryGetTickerSponsor()
+        );
+
+        private JToken? TryGetChatGiftHeader() => Memo.Cache(this, () =>
+            TryGetChatGift()?["header"]?["liveChatSponsorshipsHeaderRenderer"] ??
+            TryGetChatGift()
         );
 
         private JToken? TryGetChatViewerEngagement() => Memo.Cache(this, () =>
@@ -79,8 +96,8 @@ namespace YoutubeParser.Comments
             TryGetChatPlaceholder() != null ? _LiveChatType.Placeholder :
             TryGetChatTextMessage() != null ? _LiveChatType.Text :
             TryGetChatMembership() != null ? _LiveChatType.Membership :
-            TryGetChatPaid() != null ? _LiveChatType.SuperChat :
             TryGetChatGift() != null ? _LiveChatType.Gift :
+            TryGetChatPaid() != null ? _LiveChatType.SuperChat :
             _LiveChatType.Unknow
         );
 
@@ -93,12 +110,14 @@ namespace YoutubeParser.Comments
             TryGetChatPlaceholder() ??
             TryGetChatTextMessage() ??
             TryGetChatMembership() ??
-            TryGetChatGift() ??
+            TryGetChatGiftHeader() ??
             TryGetChatPaid()
         );
 
         public string GetLiveChatId() => Memo.Cache(this, () =>
-            TryGetChatRenderer()?["id"]?.Value<string>() ?? ""
+            TryGetChatRenderer()?["id"]?.Value<string>() ??
+            TryGetChatGift()?["id"]?.Value<string>() ??
+           (TryGetChatGift() != null ? TryGetChatGiftParent()?["id"]?.Value<string>() : null) ?? ""
         );
 
         private JToken? TryGetHeaderPrimaryText() => Memo.Cache(this, () =>
@@ -107,6 +126,7 @@ namespace YoutubeParser.Comments
         );
 
         public string GetHeaderText() => Memo.Cache(this, () =>
+            TryGetHeaderPrimaryText()?["simpleText"]?.Value<string>() ??
             TryGetHeaderPrimaryText()?["runs"]?
                 .Select(it => it?["text"]?.Value<string>())
                 .Aggregate(new StringBuilder(), (r, it) => r.Append(it))
@@ -114,7 +134,11 @@ namespace YoutubeParser.Comments
         );
 
         public string GetHeaderSubText() => Memo.Cache(this, () =>
-            TryGetChatRenderer()?["headerSubtext"]?["simpleText"]?.Value<string>() ?? ""
+            TryGetChatRenderer()?["headerSubtext"]?["simpleText"]?.Value<string>() ??
+            TryGetChatRenderer()?["headerSubtext"]?["runs"]?
+                .Select(it => it?["text"]?.Value<string>())
+                .Aggregate(new StringBuilder(), (r, it) => r.Append(it))
+                .ToString() ?? ""
         );
 
         public string GetAmount() => Memo.Cache(this, () =>
@@ -136,7 +160,9 @@ namespace YoutubeParser.Comments
         );
 
         public string GetAuthorChannelId() => Memo.Cache(this, () =>
-            TryGetChatRenderer()?["authorExternalChannelId"]?.Value<string>() ?? ""
+            TryGetChatRenderer()?["authorExternalChannelId"]?.Value<string>() ??
+            TryGetChatGift()?["authorExternalChannelId"]?.Value<string>() ??
+           (TryGetChatGift() != null ? TryGetChatGiftParent()?["id"]?.Value<string>() : null) ?? ""
         );
 
         private string? TryGetEmojiText(JObject? item)
@@ -161,7 +187,8 @@ namespace YoutubeParser.Comments
         );
 
         public long GetTimestampUsec() => Memo.Cache(this, () =>
-            TryGetChatRenderer()?["timestampUsec"]?.Value<long>() ?? 0
+            TryGetChatRenderer()?["timestampUsec"]?.Value<long>() ??
+            TryGetChatGift()?["timestampUsec"]?.Value<long>() ?? 0
         );
 
         public List<Thumbnail> GetAuthorThumbnails() => Memo.Cache(this, () =>

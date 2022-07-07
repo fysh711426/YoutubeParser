@@ -4,7 +4,7 @@ using System.Linq;
 using YoutubeParser.Shares;
 using YoutubeParser.Utils;
 
-namespace YoutubeParser.Comments
+namespace YoutubeParser.LiveChats
 {
     internal class LiveChatPageExtractor
     {

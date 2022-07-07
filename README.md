@@ -262,7 +262,7 @@ var giftChats = await youtube.Video
 
  Type       | Description
 ------------|------------------
- Text       | Message chat
+ Text       | Text message
  SuperChat  | SuperChat or SuperSticker
- Gift       | Member gift
+ Gift       | Member gift give or receive
  Membership | Member join or Member chat
