@@ -19,9 +19,9 @@ namespace YoutubeParser.Test
         {
             var files = new string[]  
             {
-                Path.Combine(TestFile.DirPath, "CommentTest_SuperThanksLightBlueYellow.txt"),
-                Path.Combine(TestFile.DirPath, "CommentTest_SuperThanksGreen.txt"),
-                Path.Combine(TestFile.DirPath, "CommentTest_SuperThanksPurple.txt")
+                Path.Combine(TestFile.DirPath, "CommentTest_SuperThanksLightBlueYellow_Html.txt"),
+                Path.Combine(TestFile.DirPath, "CommentTest_SuperThanksGreen_Html.txt"),
+                Path.Combine(TestFile.DirPath, "CommentTest_SuperThanksPurple_Html.txt")
             };
 
             var superThanks = new List<Comment>();
@@ -51,7 +51,7 @@ namespace YoutubeParser.Test
         [TestMethod]
         public void VideoCommentsReload()
         {
-            var file = Path.Combine(TestFile.DirPath, "CommentTest_VideoCommentsReload.txt");
+            var file = Path.Combine(TestFile.DirPath, "CommentTest_VideoCommentsReload_Html.txt");
             var json = File.ReadAllText(file);
             var extractor = new CommentPageExtractor(json);
             var commentItems = extractor.GetCommentItemsFromNext().ToList();
@@ -72,7 +72,7 @@ namespace YoutubeParser.Test
         [TestMethod]
         public void VideoCommentsAppend()
         {
-            var file = Path.Combine(TestFile.DirPath, "CommentTest_VideoCommentsAppend.txt");
+            var file = Path.Combine(TestFile.DirPath, "CommentTest_VideoCommentsAppend_Html.txt");
             var json = File.ReadAllText(file);
             var extractor = new CommentPageExtractor(json);
             var commentItems = extractor.GetCommentItemsFromNext().ToList();
@@ -93,7 +93,7 @@ namespace YoutubeParser.Test
         [TestMethod]
         public void VideoCommentsEmpty()
         {
-            var file = Path.Combine(TestFile.DirPath, "CommentTest_VideoCommentsEmpty.txt");
+            var file = Path.Combine(TestFile.DirPath, "CommentTest_VideoCommentsEmpty_Html.txt");
             var html = File.ReadAllText(file);
             var extractor = new CommentPageExtractor(html);
             var continuationComment = extractor.TryGetPageContinuation();
@@ -106,7 +106,7 @@ namespace YoutubeParser.Test
         [TestMethod]
         public void CommunityCommentsReload()
         {
-            var file = Path.Combine(TestFile.DirPath, "CommentTest_CommunityCommentsReload.txt");
+            var file = Path.Combine(TestFile.DirPath, "CommentTest_CommunityCommentsReload_Html.txt");
             var json = File.ReadAllText(file);
             var extractor = new CommentPageExtractor(json);
             var commentItems = extractor.GetCommentItemsFromNext().ToList();
@@ -128,7 +128,7 @@ namespace YoutubeParser.Test
         [TestMethod]
         public void CommunityCommentsAppend()
         {
-            var file = Path.Combine(TestFile.DirPath, "CommentTest_CommunityCommentsAppend.txt");
+            var file = Path.Combine(TestFile.DirPath, "CommentTest_CommunityCommentsAppend_Html.txt");
             var json = File.ReadAllText(file);
             var extractor = new CommentPageExtractor(json);
             var commentItems = extractor.GetCommentItemsFromNext().ToList();

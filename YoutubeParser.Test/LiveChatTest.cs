@@ -18,7 +18,7 @@ namespace YoutubeParser.Test
         [TestMethod]
         public void SuperChat()
         {
-            var file = Path.Combine(TestFile.DirPath, "LiveChat_SuperChat.txt");
+            var file = Path.Combine(TestFile.DirPath, "LiveChat_SuperChat_Html.txt");
             var html = File.ReadAllText(file);
             var extractor = new LiveChatPageExtractor(html);
             var liveChatItems = extractor.GetLiveChatItemsFromNext().ToList();
@@ -53,7 +53,7 @@ namespace YoutubeParser.Test
         [TestMethod]
         public void GiftChat()
         {
-            var file = Path.Combine(TestFile.DirPath, "LiveChat_GiftChat.txt");
+            var file = Path.Combine(TestFile.DirPath, "LiveChat_GiftChat_Html.txt");
             var html = File.ReadAllText(file);
             var extractor = new LiveChatPageExtractor(html);
             var liveChatItems = extractor.GetLiveChatItemsFromNext().ToList();
@@ -82,7 +82,7 @@ namespace YoutubeParser.Test
         [TestMethod]
         public void MembershipChat()
         {
-            var file = Path.Combine(TestFile.DirPath, "LiveChat_MembershipChat.txt");
+            var file = Path.Combine(TestFile.DirPath, "LiveChat_MembershipChat_Html.txt");
             var html = File.ReadAllText(file);
             var extractor = new LiveChatPageExtractor(html);
             var liveChatItems = extractor.GetLiveChatItemsFromNext().ToList();
@@ -108,7 +108,7 @@ namespace YoutubeParser.Test
         [TestMethod]
         public void PinnedChat()
         {
-            var file = Path.Combine(TestFile.DirPath, "LiveChat_PinnedChat.txt");
+            var file = Path.Combine(TestFile.DirPath, "LiveChat_PinnedChat_Html.txt");
             var html = File.ReadAllText(file);
             var extractor = new LiveChatPageExtractor(html);
             var liveChatItems = extractor.GetLiveChatItemsFromNext().ToList();

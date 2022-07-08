@@ -10,7 +10,7 @@ namespace YoutubeParser.Test
         [TestMethod]
         public void Info()
         {
-            var file = Path.Combine(TestFile.DirPath, "Channel.txt");
+            var file = Path.Combine(TestFile.DirPath, "Channel_Html.txt");
             var html = File.ReadAllText(file);
             var extractor = new ChannelPageExtractor(html);
             var channel = Map(extractor);

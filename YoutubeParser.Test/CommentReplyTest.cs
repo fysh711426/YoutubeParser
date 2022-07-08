@@ -16,7 +16,7 @@ namespace YoutubeParser.Test
         [TestMethod]
         public void VideoReplies()
         {
-            var file = Path.Combine(TestFile.DirPath, "CommentTest_VideoReplies.txt");
+            var file = Path.Combine(TestFile.DirPath, "CommentTest_VideoReplies_Html.txt");
             var json = File.ReadAllText(file);
             var extractor = new CommentPageExtractor(json);
             var commentItems = extractor.GetReplyItemsFromNext().ToList();
@@ -36,7 +36,7 @@ namespace YoutubeParser.Test
         [TestMethod]
         public void CommunityReplies()
         {
-            var file = Path.Combine(TestFile.DirPath, "CommentTest_CommunityReplies.txt");
+            var file = Path.Combine(TestFile.DirPath, "CommentTest_CommunityReplies_Html.txt");
             var json = File.ReadAllText(file);
             var extractor = new CommentPageExtractor(json);
             var commentItems = extractor.GetReplyItemsFromNext().ToList();

@@ -11,7 +11,7 @@ namespace YoutubeParser.Test
         [TestMethod]
         public void Info()
         {
-            var file = Path.Combine(TestFile.DirPath, "Community.txt");
+            var file = Path.Combine(TestFile.DirPath, "Community_Html.txt");
             var html = File.ReadAllText(file);
             var pageExtractor = new CommunityPageExtractor(html);
             var communityItem = pageExtractor.GetCommunityItems().First();
