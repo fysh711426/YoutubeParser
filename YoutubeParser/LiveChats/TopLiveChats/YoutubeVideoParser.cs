@@ -15,6 +15,7 @@ namespace YoutubeParser.Videos
         // ----- GetTopLiveChats -----
         private string? _continuationTopLiveChat;
         private JToken? _contextTopLiveChat;
+        private bool _isTopReplay = true;
 
         public async Task<List<LiveChat>> GetTopChatsListAsync(string urlOrVideoId)
         {
@@ -25,6 +26,8 @@ namespace YoutubeParser.Videos
             using var response = await _httpClient.SendAsync(request, HttpCompletionOption.ResponseHeadersRead);
             response.EnsureSuccessStatusCode();
             var html = await response.Content.ReadAsStringAsync();
+            _isTopReplay = new VideoPageExtractor(html)
+                .GetVideoStatus() == VideoStatus.Default ? true : false;
             var extractor = new LiveChatPageExtractor(html);
             _continuationTopLiveChat = extractor.TryGetTopChatContinuation();
             _contextTopLiveChat = extractor.TryGetInnerTubeContext();
@@ -40,7 +43,7 @@ namespace YoutubeParser.Videos
             if (_continuationTopLiveChat == null)
                 return null;
 
-            var apiUrl = $"https://www.youtube.com/youtubei/v1/live_chat/get_live_chat_replay?key={apiKey}";
+            var apiUrl = $"https://www.youtube.com/youtubei/v1/live_chat/get_live_chat{(_isTopReplay ? "_replay" : "")}?key={apiKey}";
             var client = _httpClient;
 
             using var request = new HttpRequestMessage(HttpMethod.Post, apiUrl);
@@ -57,8 +60,14 @@ namespace YoutubeParser.Videos
             var json = await response.Content.ReadAsStringAsync();
             var extractor = new LiveChatPageExtractor(json);
 
+            var getItems = () =>
+            {
+                if (_isTopReplay)
+                    return extractor.GetLiveChatReplayItemsFromNext();
+                return extractor.GetLiveChatItemsFromNext();
+            };
+            var liveChatItems = getItems();
             var liveChats = new List<LiveChat>();
-            var liveChatItems = extractor.GetLiveChatItemsFromNext();
             foreach (var item in liveChatItems)
             {
                 var liveChat = MapLiveChat(item);
@@ -87,6 +96,9 @@ namespace YoutubeParser.Videos
                 }
             }
             _continuationTopLiveChat = extractor.TryGetContinuation();
+            var timeoutMs = extractor.TryGetTimeoutMs();
+            if (liveChats.Count == 0)
+                _continuationTopLiveChat = null;
             return liveChats;
         }
 

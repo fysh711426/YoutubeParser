@@ -20,12 +20,16 @@ namespace YoutubeParser.LiveChats
             JsonConvert.SerializeObject(_content)
         );
 
+        private JToken? TryGetAction() => Memo.Cache(this, () =>
+            _content["actions"]?.FirstOrDefault() ?? _content
+        );
+
         private JToken? TryGetBanner() => Memo.Cache(this, () =>
-            _content["actions"]?.FirstOrDefault()?["addBannerToLiveChatCommand"]?["bannerRenderer"]?["liveChatBannerRenderer"]?["contents"]
+            TryGetAction()?["addBannerToLiveChatCommand"]?["bannerRenderer"]?["liveChatBannerRenderer"]?["contents"]
         );
 
         private JToken? TryGetTickerSponsor() => Memo.Cache(this, () =>
-            _content["actions"]?.FirstOrDefault()?["addLiveChatTickerItemAction"]?["item"]?
+            TryGetAction()?["addLiveChatTickerItemAction"]?["item"]?
                 ["liveChatTickerSponsorItemRenderer"]
         );
 
@@ -34,17 +38,17 @@ namespace YoutubeParser.LiveChats
         );
 
         private JToken? TryGetTickerPaid() => Memo.Cache(this, () =>
-            _content["actions"]?.FirstOrDefault()?["addLiveChatTickerItemAction"]?["item"]?
+            TryGetAction()?["addLiveChatTickerItemAction"]?["item"]?
                 ["liveChatTickerPaidMessageItemRenderer"]?["showItemEndpoint"]?["showLiveChatItemEndpoint"]?["renderer"]
         );
 
         private JToken? TryGetTickerPaidSticker() => Memo.Cache(this, () =>
-            _content["actions"]?.FirstOrDefault()?["addLiveChatTickerItemAction"]?["item"]?
+            TryGetAction()?["addLiveChatTickerItemAction"]?["item"]?
                 ["liveChatTickerPaidStickerItemRenderer"]?["showItemEndpoint"]?["showLiveChatItemEndpoint"]?["renderer"]
         );
 
         private JToken? TryGetChatItem() => Memo.Cache(this, () =>
-            _content["actions"]?.FirstOrDefault()?["addChatItemAction"]?["item"]
+            TryGetAction()?["addChatItemAction"]?["item"]
         );
 
         private JToken? TryGetChatTextMessage() => Memo.Cache(this, () =>

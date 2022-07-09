@@ -44,7 +44,18 @@ namespace YoutubeParser.LiveChats
 
         public string? TryGetContinuation() => Memo.Cache(this, () =>
             TryGetResponseLiveChat()?["continuations"]?
-                .FirstOrDefault()?["liveChatReplayContinuationData"]?["continuation"]?.Value<string>()
+                .FirstOrDefault()?["liveChatReplayContinuationData"]?["continuation"]?.Value<string>() ??
+            TryGetResponseLiveChat()?["continuations"]?
+                .FirstOrDefault()?["timedContinuationData"]?["continuation"]?.Value<string>() ??
+            TryGetResponseLiveChat()?["continuations"]?
+                .FirstOrDefault()?["invalidationContinuationData"]?["continuation"]?.Value<string>()
+        );
+
+        public int? TryGetTimeoutMs() => Memo.Cache(this, () =>
+            TryGetResponseLiveChat()?["continuations"]?
+                .FirstOrDefault()?["timedContinuationData"]?["timeoutMs"]?.Value<int>() ??
+            TryGetResponseLiveChat()?["continuations"]?
+                .FirstOrDefault()?["invalidationContinuationData"]?["timeoutMs"]?.Value<int>()
         );
 
         private JToken? TryGetResponseLiveChat() => Memo.Cache(this, () =>
@@ -58,6 +69,21 @@ namespace YoutubeParser.LiveChats
         );
 
         public IEnumerable<JToken> GetLiveChatItemsFromNext()
+        {
+            var contents = GetLiveChatContentsFromNext();
+            foreach (var content in contents)
+            {
+                if (content?.ContainsKey("markChatItemAsDeletedAction") == true)
+                    continue;
+                var liveChat = content;
+                if (liveChat != null)
+                {
+                    yield return liveChat;
+                }
+            }
+        }
+
+        public IEnumerable<JToken> GetLiveChatReplayItemsFromNext()
         {
             var contents = GetLiveChatContentsFromNext();
             foreach (var content in contents)

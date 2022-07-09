@@ -187,7 +187,7 @@ var pastLiveStreams = await youtube.Channel
  Status   | Description
 ----------|------------------
  Default  | Streamed or Premiered or Upload video
- Live     | Streaming or Premiere in progress
+ Live     | Streaming or Premiering
  Upcoming | Scheduled or Premieres
 
 ---  
@@ -264,5 +264,5 @@ var giftChats = await youtube.Video
 ------------|------------------
  Text       | Text message
  SuperChat  | SuperChat or SuperSticker
- Gift       | Member gift give or receive
+ Gift       | Give member gift or Receive member gift
  Membership | Member join or Member chat

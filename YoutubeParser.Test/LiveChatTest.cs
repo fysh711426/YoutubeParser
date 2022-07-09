@@ -21,7 +21,7 @@ namespace YoutubeParser.Test
             var file = Path.Combine(TestFile.DirPath, "LiveChat_SuperChat_Html.txt");
             var html = File.ReadAllText(file);
             var extractor = new LiveChatPageExtractor(html);
-            var liveChatItems = extractor.GetLiveChatItemsFromNext().ToList();
+            var liveChatItems = extractor.GetLiveChatReplayItemsFromNext().ToList();
             var continuation = extractor.TryGetContinuation();
 
             var liveChats = MapList(liveChatItems);
@@ -56,7 +56,7 @@ namespace YoutubeParser.Test
             var file = Path.Combine(TestFile.DirPath, "LiveChat_GiftChat_Html.txt");
             var html = File.ReadAllText(file);
             var extractor = new LiveChatPageExtractor(html);
-            var liveChatItems = extractor.GetLiveChatItemsFromNext().ToList();
+            var liveChatItems = extractor.GetLiveChatReplayItemsFromNext().ToList();
             var continuation = extractor.TryGetContinuation();
 
             var liveChats = MapList(liveChatItems);
@@ -85,7 +85,7 @@ namespace YoutubeParser.Test
             var file = Path.Combine(TestFile.DirPath, "LiveChat_MembershipChat_Html.txt");
             var html = File.ReadAllText(file);
             var extractor = new LiveChatPageExtractor(html);
-            var liveChatItems = extractor.GetLiveChatItemsFromNext().ToList();
+            var liveChatItems = extractor.GetLiveChatReplayItemsFromNext().ToList();
             var continuation = extractor.TryGetContinuation();
 
             var liveChats = MapList(liveChatItems);
@@ -111,7 +111,7 @@ namespace YoutubeParser.Test
             var file = Path.Combine(TestFile.DirPath, "LiveChat_PinnedChat_Html.txt");
             var html = File.ReadAllText(file);
             var extractor = new LiveChatPageExtractor(html);
-            var liveChatItems = extractor.GetLiveChatItemsFromNext().ToList();
+            var liveChatItems = extractor.GetLiveChatReplayItemsFromNext().ToList();
             var continuation = extractor.TryGetContinuation();
 
             var liveChats = MapList(liveChatItems);
