@@ -4,7 +4,7 @@ using System.Collections.Generic;
 using System.Net.Http;
 using System.Text;
 using System.Threading.Tasks;
-using YoutubeParser.Comments;
+using YoutubeParser.Extensions;
 using YoutubeParser.LiveChats;
 using YoutubeParser.Shares;
 
@@ -16,6 +16,15 @@ namespace YoutubeParser.Videos
         private string? _continuationTopLiveChat;
         private JToken? _contextTopLiveChat;
         private bool _isTopReplay = true;
+
+        private LiveChat MapTopLiveChat(JToken content)
+        {
+            var liveChat = MapLiveChatBase(content);
+            if (!_isTopReplay)
+                liveChat.TimestampText = liveChat.TimestampUsec
+                    .GetTimestampUsecText();
+            return liveChat;
+        }
 
         public async Task<List<LiveChat>> GetTopChatsListAsync(string urlOrVideoId)
         {
@@ -70,7 +79,7 @@ namespace YoutubeParser.Videos
             var liveChats = new List<LiveChat>();
             foreach (var item in liveChatItems)
             {
-                var liveChat = MapLiveChat(item);
+                var liveChat = MapTopLiveChat(item);
                 if (liveChat._liveChatType != _LiveChatType.System &&
                     liveChat._liveChatType != _LiveChatType.Placeholder)
                 {
@@ -96,8 +105,9 @@ namespace YoutubeParser.Videos
                 }
             }
             _continuationTopLiveChat = extractor.TryGetContinuation();
-            var timeoutMs = extractor.TryGetTimeoutMs();
-            if (liveChats.Count == 0)
+            _timeoutMs = extractor.TryGetTimeoutMs() ?? 0;
+            if (!_loop)
+                if (liveChats.Count == 0)
                 _continuationTopLiveChat = null;
             return liveChats;
         }

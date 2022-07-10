@@ -1,10 +1,11 @@
 ﻿using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Net.Http;
 using System.Text;
 using System.Threading.Tasks;
-using YoutubeParser.Comments;
+using YoutubeParser.Extensions;
 using YoutubeParser.LiveChats;
 using YoutubeParser.Shares;
 
@@ -16,8 +17,10 @@ namespace YoutubeParser.Videos
         private string? _continuationLiveChat;
         private JToken? _contextLiveChat;
         private bool _isReplay = true;
+        private int _timeoutMs = 0;
+        private bool _loop = false;
 
-        private LiveChat MapLiveChat(JToken content)
+        private LiveChat MapLiveChatBase(JToken content)
         {
             var extractor = new LiveChatExtractor(content);
             return new LiveChat
@@ -29,15 +32,24 @@ namespace YoutubeParser.Videos
                 AuthorTitle = extractor.GetAuthorTitle(),
                 AuthorChannelId = extractor.GetAuthorChannelId(),
                 AuthorThumbnails = extractor.GetAuthorThumbnails(),
-                TimestampText = extractor.GetTimestampText(),
-                TimestampUsec = extractor.GetTimestampUsec(),
                 HeaderText = extractor.GetHeaderText(),
                 HeaderSubText = extractor.GetHeaderSubText(),
                 Amount = extractor.GetAmount(),
                 AmountColor = extractor.TryGetAmountColor(),
                 IsPinned = extractor.IsPinned(),
+                TimestampUsec = extractor.GetTimestampUsec(),
+                TimestampText = extractor.GetTimestampText(),
                 //Json = extractor.GetJson()
             };
+        }
+
+        private LiveChat MapLiveChat(JToken content)
+        {
+            var liveChat = MapLiveChatBase(content);
+            if (!_isReplay)
+                liveChat.TimestampText = liveChat.TimestampUsec
+                    .GetTimestampUsecText();
+            return liveChat;
         }
 
         public async Task<List<LiveChat>> GetLiveChatsListAsync(string urlOrVideoId)
@@ -119,9 +131,10 @@ namespace YoutubeParser.Videos
                 }
             }
             _continuationLiveChat = extractor.TryGetContinuation();
-            var timeoutMs = extractor.TryGetTimeoutMs();
-            if (liveChats.Count == 0)
-                _continuationLiveChat = null;
+            _timeoutMs = extractor.TryGetTimeoutMs() ?? 0;
+            if (!_loop)
+                if (liveChats.Count == 0)
+                    _continuationLiveChat = null;
             return liveChats;
         }
 

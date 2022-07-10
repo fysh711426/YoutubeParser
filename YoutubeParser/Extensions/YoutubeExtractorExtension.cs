@@ -53,6 +53,18 @@ namespace YoutubeParser.Extensions
                     ? result : null;
         }
 
+        public static DateTime GetUsecDateTime(this long timestampUsec)
+        {
+            return DateTime.Parse("1970/01/01")
+                .AddSeconds(timestampUsec / (1000 * 1000)).ToLocalTime();
+        }
+
+        public static string GetTimestampUsecText(this long timestampUsec)
+        {
+            return timestampUsec.GetUsecDateTime()
+                .ToString("hh:mm tt", new CultureInfo("en-US"));
+        }
+
         public static long GetPublishedTimeSeconds(this string publishedTime)
         {
             var val = publishedTime
