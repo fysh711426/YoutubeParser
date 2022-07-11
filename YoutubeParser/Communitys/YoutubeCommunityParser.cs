@@ -44,8 +44,8 @@ namespace YoutubeParser.Communitys
                 Images = extractor.GetImages(),
                 PublishedTime = extractor.GetPublishedTime(),
                 PublishedTimeSeconds = extractor.GetPublishedTimeSeconds(),
-                LikeCount = extractor.GetLikeCount(),
-                VoteStatus = extractor.GetVoteStatus()
+                LikeCount = extractor.GetLikeCount()
+                //VoteStatus = extractor.GetVoteStatus()
             };
             return community;
         }

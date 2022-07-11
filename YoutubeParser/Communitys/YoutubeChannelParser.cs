@@ -30,8 +30,8 @@ namespace YoutubeParser.Channels
                 PublishedTime = extractor.GetPublishedTime(),
                 PublishedTimeSeconds = extractor.GetPublishedTimeSeconds(),
                 LikeCount = extractor.GetLikeCount(),
-                VoteStatus = extractor.GetVoteStatus(),
                 ReplyCount = extractor.GetReplyCount()
+                //VoteStatus = extractor.GetVoteStatus()
             };
         }
 

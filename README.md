@@ -29,7 +29,8 @@ PM> Install-Package System.Linq.Async
 `videoId` or `channelId` can use url or id.  
 
 ```C#
-var youtube = new YoutubeClient();
+// Each request in client is delay by 1 second
+var youtube = new YoutubeClient(() => 1000);
 
 // Get Video
 var video = await youtube.Video.GetAsync(videoId);
@@ -156,6 +157,29 @@ var topChats = await youtube.Video
 var liveChats = await youtube.Video
     .GetLiveChatsAsync(videoId)
     .ToListAsync();
+```
+
+---  
+
+> **Note**  
+> If you want to receive chat continuously, you can use this.  
+
+#### Receive Video TopChats  
+
+```C#
+await youtube.Video.OnTopChatsAsync(videoId, (item) =>
+{
+    // do something
+});
+```
+
+#### Receive Video LiveChats  
+
+```C#
+await youtube.Video.OnLiveChatsAsync(videoId, (item) =>
+{
+    // do something
+});
 ```
 
 ---  

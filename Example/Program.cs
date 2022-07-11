@@ -1,4 +1,5 @@
-﻿using YoutubeParser;
+﻿using System.Text;
+using YoutubeParser;
 using YoutubeParser.Extensions;
 using YoutubeParser.Shares;
 using YoutubeParser.Utils;
@@ -13,7 +14,8 @@ namespace Example
             var channelId = "ChannelUrl or ChannelId";
             var communityId = "CommunityUrl or CommunityId";
 
-            var youtube = new YoutubeClient();
+            // Each request in client is delay by 1 second
+            var youtube = new YoutubeClient(() => 1000);
 
             // Get Video
             var video = await youtube.Video.GetAsync(videoId);
@@ -89,6 +91,18 @@ namespace Example
             var liveChats = await youtube.Video
                 .GetLiveChatsAsync(videoId)
                 .ToListAsync();
+
+            // Receive Video TopChats
+            await youtube.Video.OnTopChatsAsync(videoId, (item) =>
+            {
+                // do something
+            });
+
+            // Receive Video LiveChats
+            await youtube.Video.OnLiveChatsAsync(videoId, (item) =>
+            {
+                // do something
+            });
 
             // Get all past live streams
             var pastLiveStreams = await youtube.Channel

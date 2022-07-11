@@ -34,8 +34,8 @@ namespace YoutubeParser.Test
                 Images = extractor.GetImages(),
                 PublishedTime = extractor.GetPublishedTime(),
                 PublishedTimeSeconds = extractor.GetPublishedTimeSeconds(),
-                LikeCount = extractor.GetLikeCount(),
-                VoteStatus = extractor.GetVoteStatus()
+                LikeCount = extractor.GetLikeCount()
+                //VoteStatus = extractor.GetVoteStatus()
             };
         }
     }
