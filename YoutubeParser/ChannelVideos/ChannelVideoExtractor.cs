@@ -1,6 +1,7 @@
 ﻿using Newtonsoft.Json.Linq;
 using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
 using System.Text;
 using YoutubeParser.Extensions;
@@ -43,7 +44,7 @@ namespace YoutubeParser.ChannelVideos
             TryGetUpcomingStartTimeText()?
                 .Pipe(it => long.TryParse(it, out var result) ?
                     (long?)result : null)?
-                        .Pipe(it => DateTime.Parse("1970/01/01")
+                        .Pipe(it => DateTime.Parse("1970/01/01", DateTimeFormatInfo.InvariantInfo)
                             .AddSeconds(it).ToLocalTime())
         );
 

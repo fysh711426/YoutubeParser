@@ -29,13 +29,22 @@ namespace YoutubeParser.Videos
             var video = new YoutubeVideoParser(_httpClient, _requestDelay);
             video._loop = true;
 
+            var delayWarp = async (int delay, CancellationToken token) =>
+            {
+                try
+                {
+                    await Task.Delay(delay, token);
+                }
+                catch (TaskCanceledException) { }
+            };
+
             var isRun = false;
             var runTask = () =>
             {
                 if (!isRun)
                 {
                     isRun = true;
-                    Task.Run(() =>
+                    Task.Run(async () =>
                     {
                         while (true)
                         {
@@ -48,7 +57,7 @@ namespace YoutubeParser.Videos
                             {
                                 var delay = (int)(item.timeout - DateTime.UtcNow).TotalMilliseconds;
                                 if (delay > 0)
-                                    Thread.Sleep(delay);
+                                    await delayWarp(delay, token);
                                 callback(item.liveChat);
                             }
                         }
@@ -103,7 +112,7 @@ namespace YoutubeParser.Videos
                 throw new Exception("Video is not live.");
 
             appends(liveChats);
-            await Task.Delay(video._timeoutMs);
+            await delayWarp(video._timeoutMs, token);
 
             while (true)
             {
@@ -113,7 +122,7 @@ namespace YoutubeParser.Videos
                 if (nextLiveChats == null)
                     break;
                 appends(nextLiveChats);
-                await Task.Delay(video._timeoutMs);
+                await delayWarp(video._timeoutMs, token);
             }
 
             while (isRun)

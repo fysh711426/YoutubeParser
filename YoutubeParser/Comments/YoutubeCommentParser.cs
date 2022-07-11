@@ -105,7 +105,7 @@ namespace YoutubeParser.Comments
             {
                 token.ThrowIfCancellationRequested();
                 if (_requestDelay != null)
-                    await Task.Delay(_requestDelay());
+                    await Task.Delay(_requestDelay(), token);
                 var nextComments = await GetNextRepliesListAsync(token);
                 if (nextComments == null)
                     break;

@@ -1,6 +1,7 @@
 ﻿using Newtonsoft.Json.Linq;
 using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
 using System.Text;
 using System.Text.RegularExpressions;
@@ -85,8 +86,9 @@ namespace YoutubeParser.Videos
                 .Pipe(it => Regex.Match(it, @"([A-Z][a-z]+\s[0-9]+,\s[0-9]+)"))
                 .Select(m => m.Groups[1].Value)
                 .Pipe(it => it != "" ? it : TryGetUploadDate())?
-                .Pipe(it => DateTime.TryParse(it, out var result) ?
-                    (DateTime?)result : null) ?? default(DateTime)
+                .Pipe(it => DateTime.TryParse(it, DateTimeFormatInfo.InvariantInfo,
+                    DateTimeStyles.None, out var result) ?
+                        (DateTime?)result : null) ?? default(DateTime)
                 
         );
 

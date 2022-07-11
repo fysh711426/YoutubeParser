@@ -167,7 +167,7 @@ namespace YoutubeParser.Videos
             {
                 token.ThrowIfCancellationRequested();
                 if (_requestDelay != null)
-                    await Task.Delay(_requestDelay());
+                    await Task.Delay(_requestDelay(), token);
                 var nextLiveChats = await GetNextLiveChatsListAsync(token);
                 if (nextLiveChats == null)
                     break;

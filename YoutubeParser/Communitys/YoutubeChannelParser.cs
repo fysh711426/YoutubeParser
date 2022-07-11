@@ -114,7 +114,7 @@ namespace YoutubeParser.Channels
             {
                 token.ThrowIfCancellationRequested();
                 if (_requestDelay != null)
-                    await Task.Delay(_requestDelay());
+                    await Task.Delay(_requestDelay(), token);
                 var nextCommunitys = await GetNextCommunitysListAsync(token);
                 if (nextCommunitys == null)
                     break;

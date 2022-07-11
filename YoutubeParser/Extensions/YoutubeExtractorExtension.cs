@@ -55,7 +55,7 @@ namespace YoutubeParser.Extensions
 
         public static DateTime GetUsecDateTime(this long timestampUsec)
         {
-            return DateTime.Parse("1970/01/01")
+            return DateTime.Parse("1970/01/01", DateTimeFormatInfo.InvariantInfo)
                 .AddSeconds(timestampUsec / (1000 * 1000)).ToLocalTime();
         }
 
