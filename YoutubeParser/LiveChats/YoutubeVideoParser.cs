@@ -3,6 +3,7 @@ using Newtonsoft.Json.Linq;
 using System.Collections.Generic;
 using System.Globalization;
 using System.Net.Http;
+using System.Runtime.CompilerServices;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
@@ -153,20 +154,26 @@ namespace YoutubeParser.Videos
         }
 
 #if (!NET45 && !NET46)
-        public async IAsyncEnumerable<LiveChat> GetLiveChatsAsync(string urlOrCommunityId)
+        public async IAsyncEnumerable<LiveChat> GetLiveChatsAsync(string urlOrCommunityId,
+            [EnumeratorCancellation] CancellationToken token = default)
         {
-            var liveChats = await GetLiveChatsListAsync(urlOrCommunityId);
+            var liveChats = await GetLiveChatsListAsync(urlOrCommunityId, token);
             foreach (var item in liveChats)
             {
+                token.ThrowIfCancellationRequested();
                 yield return item;
             }
             while (true)
             {
-                var nextLiveChats = await GetNextLiveChatsListAsync();
+                token.ThrowIfCancellationRequested();
+                if (_requestDelay != null)
+                    await Task.Delay(_requestDelay());
+                var nextLiveChats = await GetNextLiveChatsListAsync(token);
                 if (nextLiveChats == null)
                     break;
                 foreach (var item in nextLiveChats)
                 {
+                    token.ThrowIfCancellationRequested();
                     yield return item;
                 }
             }

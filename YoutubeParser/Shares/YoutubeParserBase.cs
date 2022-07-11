@@ -1,4 +1,5 @@
-﻿using System.Linq;
+﻿using System;
+using System.Linq;
 using System.Net.Http;
 
 namespace YoutubeParser.Shares
@@ -11,10 +12,13 @@ namespace YoutubeParser.Shares
         protected static readonly string userAgent =
             @"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/97.0.4692.99 Safari/537.36";
         protected readonly HttpClient _httpClient;
+        protected readonly Func<int>? _requestDelay;
 
-        protected YoutubeParserBase(HttpClient httpClient)
+        protected YoutubeParserBase(
+            HttpClient httpClient, Func<int>? requestDelay)
         {
             _httpClient = httpClient;
+            _requestDelay = requestDelay;
         }
 
         protected string GetChannelUrl(string urlOrChannelId)

@@ -1,4 +1,5 @@
-﻿using System.Net.Http;
+﻿using System;
+using System.Net.Http;
 using YoutubeParser.Channels;
 using YoutubeParser.Comments;
 using YoutubeParser.Communitys;
@@ -13,16 +14,28 @@ namespace YoutubeParser
         public YoutubeVideoParser Video { get; set; }
         public YoutubeCommunityParser Community { get; set; }
         public YoutubeCommentParser Comment { get; set; }
+
         public YoutubeClient() : 
-            this(Http.Client)
+            this(Http.Client, null)
         {
         }
-        public YoutubeClient(HttpClient httpClient)
+
+        public YoutubeClient(HttpClient httpClient) :
+            this(httpClient, null)
         {
-            Channel = new YoutubeChannelParser(httpClient);
-            Video = new YoutubeVideoParser(httpClient);
-            Community = new YoutubeCommunityParser(httpClient);
-            Comment = new YoutubeCommentParser(httpClient);
+        }
+
+        public YoutubeClient(Func<int> requestDelay) :
+            this(Http.Client, requestDelay)
+        {
+        }
+
+        public YoutubeClient(HttpClient httpClient, Func<int>? requestDelay)
+        {
+            Channel = new YoutubeChannelParser(httpClient, requestDelay);
+            Video = new YoutubeVideoParser(httpClient, requestDelay);
+            Community = new YoutubeCommunityParser(httpClient, requestDelay);
+            Comment = new YoutubeCommentParser(httpClient, requestDelay);
         }
     }
 }

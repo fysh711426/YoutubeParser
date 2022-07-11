@@ -9,8 +9,9 @@ namespace YoutubeParser.Communitys
 {
     public partial class YoutubeCommunityParser : YoutubeParserBase
     {
-        public YoutubeCommunityParser(HttpClient httpClient)
-            : base(httpClient)
+        public YoutubeCommunityParser(
+            HttpClient httpClient, Func<int>? requestDelay)
+                : base(httpClient, requestDelay)
         {
         }
 

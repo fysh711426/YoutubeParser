@@ -1,4 +1,5 @@
-﻿using System.Net.Http;
+﻿using System;
+using System.Net.Http;
 using System.Threading;
 using System.Threading.Tasks;
 using YoutubeParser.Shares;
@@ -7,8 +8,9 @@ namespace YoutubeParser.Videos
 {
     public partial class YoutubeVideoParser : YoutubeParserBase
     {
-        public YoutubeVideoParser(HttpClient httpClient)
-            : base(httpClient)
+        public YoutubeVideoParser(
+            HttpClient httpClient, Func<int>? requestDelay)
+                : base(httpClient, requestDelay)
         {
         }
 

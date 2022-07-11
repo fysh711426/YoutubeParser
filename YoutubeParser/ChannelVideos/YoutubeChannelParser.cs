@@ -2,6 +2,7 @@
 using Newtonsoft.Json.Linq;
 using System.Collections.Generic;
 using System.Net.Http;
+using System.Runtime.CompilerServices;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
@@ -101,20 +102,26 @@ namespace YoutubeParser.Channels
         }
 
 #if (!NET45 && !NET46)
-        public async IAsyncEnumerable<ChannelVideo> GetVideosAsync(string urlOrChannelId)
+        public async IAsyncEnumerable<ChannelVideo> GetVideosAsync(string urlOrChannelId,
+            [EnumeratorCancellation] CancellationToken token = default)
         {
-            var videos = await GetVideosListAsync(urlOrChannelId);
+            var videos = await GetVideosListAsync(urlOrChannelId, token);
             foreach (var item in videos)
             {
+                token.ThrowIfCancellationRequested();
                 yield return item;
             }
             while (true)
             {
-                var nextVideos = await GetNextVideosListAsync();
+                token.ThrowIfCancellationRequested();
+                if (_requestDelay != null)
+                    await Task.Delay(_requestDelay());
+                var nextVideos = await GetNextVideosListAsync(token);
                 if (nextVideos == null)
                     break;
                 foreach (var item in nextVideos)
                 {
+                    token.ThrowIfCancellationRequested();
                     yield return item;
                 }
             }

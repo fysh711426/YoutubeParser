@@ -26,7 +26,7 @@ namespace YoutubeParser.Videos
             Action<LiveChat> callback, CancellationToken token = default)
         {
             var queue = new ConcurrentQueue<(LiveChat liveChat, DateTime timeout)>();
-            var video = new YoutubeVideoParser(_httpClient);
+            var video = new YoutubeVideoParser(_httpClient, _requestDelay);
             video._loop = true;
 
             var isRun = false;
@@ -77,15 +77,15 @@ namespace YoutubeParser.Videos
             var getChatsAsync = () =>
             {
                 if (isTop)
-                    return video.GetTopChatsListAsync(urlOrVideoId);
-                return video.GetLiveChatsListAsync(urlOrVideoId);
+                    return video.GetTopChatsListAsync(urlOrVideoId, token);
+                return video.GetLiveChatsListAsync(urlOrVideoId, token);
             };
 
             var getNextChatsAsync = () =>
             {
                 if (isTop)
-                    return video.GetNextTopChatsListAsync();
-                return video.GetNextLiveChatsListAsync();
+                    return video.GetNextTopChatsListAsync(token);
+                return video.GetNextLiveChatsListAsync(token);
             };
 
             var isReplay = () =>

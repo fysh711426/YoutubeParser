@@ -2,6 +2,7 @@
 using Newtonsoft.Json.Linq;
 using System.Collections.Generic;
 using System.Net.Http;
+using System.Runtime.CompilerServices;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
@@ -100,20 +101,26 @@ namespace YoutubeParser.Videos
         }
 
 #if (!NET45 && !NET46)
-        public async IAsyncEnumerable<Comment> GetCommentsAsync(string urlOrCommunityId)
+        public async IAsyncEnumerable<Comment> GetCommentsAsync(string urlOrCommunityId,
+            [EnumeratorCancellation] CancellationToken token = default)
         {
-            var comments = await GetCommentsListAsync(urlOrCommunityId);
+            var comments = await GetCommentsListAsync(urlOrCommunityId, token);
             foreach (var item in comments)
             {
+                token.ThrowIfCancellationRequested();
                 yield return item;
             }
             while (true)
             {
-                var nextComments = await GetNextCommentsListAsync();
+                token.ThrowIfCancellationRequested();
+                if (_requestDelay != null)
+                    await Task.Delay(_requestDelay());
+                var nextComments = await GetNextCommentsListAsync(token);
                 if (nextComments == null)
                     break;
                 foreach (var item in nextComments)
                 {
+                    token.ThrowIfCancellationRequested();
                     yield return item;
                 }
             }

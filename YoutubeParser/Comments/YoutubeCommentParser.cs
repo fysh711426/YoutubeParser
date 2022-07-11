@@ -1,7 +1,9 @@
 ﻿using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
+using System;
 using System.Collections.Generic;
 using System.Net.Http;
+using System.Runtime.CompilerServices;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
@@ -12,8 +14,9 @@ namespace YoutubeParser.Comments
 {
     public partial class YoutubeCommentParser : YoutubeParserBase
     {
-        public YoutubeCommentParser(HttpClient httpClient)
-            : base(httpClient)
+        public YoutubeCommentParser(
+            HttpClient httpClient, Func<int>? requestDelay)
+                : base(httpClient, requestDelay)
         {
         }
 
@@ -89,20 +92,26 @@ namespace YoutubeParser.Comments
         }
 
 #if (!NET45 && !NET46)
-        public async IAsyncEnumerable<CommentReply> GetRepliesAsync(Comment comment)
+        public async IAsyncEnumerable<CommentReply> GetRepliesAsync(Comment comment,
+            [EnumeratorCancellation] CancellationToken token = default)
         {
-            var comments = await GetRepliesListAsync(comment);
+            var comments = await GetRepliesListAsync(comment, token);
             foreach (var item in comments)
             {
+                token.ThrowIfCancellationRequested();
                 yield return item;
             }
             while (true)
             {
-                var nextComments = await GetNextRepliesListAsync();
+                token.ThrowIfCancellationRequested();
+                if (_requestDelay != null)
+                    await Task.Delay(_requestDelay());
+                var nextComments = await GetNextRepliesListAsync(token);
                 if (nextComments == null)
                     break;
                 foreach (var item in nextComments)
                 {
+                    token.ThrowIfCancellationRequested();
                     yield return item;
                 }
             }
