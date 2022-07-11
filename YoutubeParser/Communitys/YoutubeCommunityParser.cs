@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Linq;
 using System.Net.Http;
+using System.Threading;
 using System.Threading.Tasks;
 using YoutubeParser.Shares;
 
@@ -14,15 +15,20 @@ namespace YoutubeParser.Communitys
         }
 
         // ----- GetCommunity -----
-        public async Task<Community> GetAsync(string urlOrCommunityId)
+        public async Task<Community> GetAsync(string urlOrCommunityId, CancellationToken token = default)
         {
             var url = $"{GetCommunityUrl(urlOrCommunityId)}";
             using var request = new HttpRequestMessage(HttpMethod.Get, url);
             SetDefaultHttpRequest(request);
-            using var response = await _httpClient.SendAsync(request, HttpCompletionOption.ResponseHeadersRead);
+            using var response = await _httpClient.SendAsync(request, 
+                HttpCompletionOption.ResponseHeadersRead, token);
             response.EnsureSuccessStatusCode();
+
+            token.ThrowIfCancellationRequested();
             var html = await response.Content.ReadAsStringAsync();
             var pageExtractor = new CommunityPageExtractor(html);
+
+            token.ThrowIfCancellationRequested();
             var item = pageExtractor.GetCommunityItems().FirstOrDefault();
             if (item == null)
                 throw new Exception("Not found community.");

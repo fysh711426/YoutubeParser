@@ -3,6 +3,7 @@ using Newtonsoft.Json.Linq;
 using System.Collections.Generic;
 using System.Net.Http;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 using YoutubeParser.ChannelVideos;
 
@@ -34,20 +35,25 @@ namespace YoutubeParser.Channels
             };
         }
 
-        public async Task<List<ChannelVideo>> GetVideosListAsync(string urlOrChannelId)
+        public async Task<List<ChannelVideo>> GetVideosListAsync(string urlOrChannelId, CancellationToken token = default)
         {
             var url = $"{GetChannelUrl(urlOrChannelId)}/videos";
             using var request = new HttpRequestMessage(HttpMethod.Get, url);
             SetDefaultHttpRequest(request);
-            using var response = await _httpClient.SendAsync(request, HttpCompletionOption.ResponseHeadersRead);
+            using var response = await _httpClient.SendAsync(request, 
+                HttpCompletionOption.ResponseHeadersRead, token);
             response.EnsureSuccessStatusCode();
+
+            token.ThrowIfCancellationRequested();
             var html = await response.Content.ReadAsStringAsync();
             var extractor = new ChannelVideoPageExtractor(html);
-            
+
+            token.ThrowIfCancellationRequested();
             var videos = new List<ChannelVideo>();
             var videoItems = extractor.GetVideoItems();
             foreach (var item in videoItems)
             {
+                token.ThrowIfCancellationRequested();
                 videos.Add(MapVideo(item));
             }
             // must be after each GetVideoItems
@@ -56,7 +62,7 @@ namespace YoutubeParser.Channels
             return videos;
         }
 
-        public async Task<List<ChannelVideo>?> GetNextVideosListAsync()
+        public async Task<List<ChannelVideo>?> GetNextVideosListAsync(CancellationToken token = default)
         {
             if (_continuation == null)
                 return null;
@@ -73,15 +79,20 @@ namespace YoutubeParser.Channels
             var content = new StringContent(
                 JsonConvert.SerializeObject(payload), Encoding.UTF8, "application/json");
             request.Content = content;
-            using var response = await client.SendAsync(request, HttpCompletionOption.ResponseHeadersRead);
+            using var response = await client.SendAsync(request, 
+                HttpCompletionOption.ResponseHeadersRead, token);
             response.EnsureSuccessStatusCode();
+
+            token.ThrowIfCancellationRequested();
             var json = await response.Content.ReadAsStringAsync();
             var extractor = new ChannelVideoPageExtractor(json);
 
+            token.ThrowIfCancellationRequested();
             var videos = new List<ChannelVideo>();
             var videoItems = extractor.GetVideoItemsFromNext();
             foreach (var item in videoItems)
             {
+                token.ThrowIfCancellationRequested();
                 videos.Add(MapVideo(item));
             }
             // must be after each GetVideoItemsFromNext

@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Globalization;
 using System.Net.Http;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 using YoutubeParser.Extensions;
 using YoutubeParser.LiveChats;
@@ -52,28 +53,35 @@ namespace YoutubeParser.Videos
             return liveChat;
         }
 
-        public async Task<List<LiveChat>> GetLiveChatsListAsync(string urlOrVideoId)
+        public async Task<List<LiveChat>> GetLiveChatsListAsync(string urlOrVideoId, CancellationToken token = default)
         {
             _liveChatDict = new();
             var url = $"{GetVideoUrl(urlOrVideoId)}";
             using var request = new HttpRequestMessage(HttpMethod.Get, url);
             SetDefaultHttpRequest(request);
-            using var response = await _httpClient.SendAsync(request, HttpCompletionOption.ResponseHeadersRead);
+            using var response = await _httpClient.SendAsync(request, 
+                HttpCompletionOption.ResponseHeadersRead, token);
             response.EnsureSuccessStatusCode();
+
+            token.ThrowIfCancellationRequested();
             var html = await response.Content.ReadAsStringAsync();
             _isReplay = new VideoPageExtractor(html)
                 .GetVideoStatus() == VideoStatus.Default ? true : false;
             var extractor = new LiveChatPageExtractor(html);
+
+            token.ThrowIfCancellationRequested();
             _continuationLiveChat = extractor.TryGetLiveChatContinuation();
             _contextLiveChat = extractor.TryGetInnerTubeContext();
             if (_continuationLiveChat == null)
                 return new List<LiveChat>();
-            var liveChats = await GetNextLiveChatsListAsync();
+
+            token.ThrowIfCancellationRequested();
+            var liveChats = await GetNextLiveChatsListAsync(token);
             return liveChats ?? new List<LiveChat>();
         }
 
         private Dictionary<string, LiveChat> _liveChatDict = new();
-        public async Task<List<LiveChat>?> GetNextLiveChatsListAsync()
+        public async Task<List<LiveChat>?> GetNextLiveChatsListAsync(CancellationToken token = default)
         {
             if (_continuationLiveChat == null)
                 return null;
@@ -90,8 +98,11 @@ namespace YoutubeParser.Videos
             var content = new StringContent(
                 JsonConvert.SerializeObject(payload), Encoding.UTF8, "application/json");
             request.Content = content;
-            using var response = await client.SendAsync(request, HttpCompletionOption.ResponseHeadersRead);
+            using var response = await client.SendAsync(request, 
+                HttpCompletionOption.ResponseHeadersRead, token);
             response.EnsureSuccessStatusCode();
+
+            token.ThrowIfCancellationRequested();
             var json = await response.Content.ReadAsStringAsync();
             var extractor = new LiveChatPageExtractor(json);
 
@@ -101,10 +112,13 @@ namespace YoutubeParser.Videos
                     return extractor.GetLiveChatReplayItemsFromNext();
                 return extractor.GetLiveChatItemsFromNext();
             };
+
+            token.ThrowIfCancellationRequested();
             var liveChatItems = getItems();
             var liveChats = new List<LiveChat>();
             foreach (var item in liveChatItems)
             {
+                token.ThrowIfCancellationRequested();
                 var liveChat = MapLiveChat(item);
                 if (liveChat._liveChatType != _LiveChatType.System &&
                     liveChat._liveChatType != _LiveChatType.Placeholder)

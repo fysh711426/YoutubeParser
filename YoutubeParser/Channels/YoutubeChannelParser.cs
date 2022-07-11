@@ -1,4 +1,5 @@
 ﻿using System.Net.Http;
+using System.Threading;
 using System.Threading.Tasks;
 using YoutubeParser.Shares;
 
@@ -12,16 +13,18 @@ namespace YoutubeParser.Channels
         }
 
         // ----- GetChannel -----
-        public async Task<Channel> GetAsync(string urlOrChannelId)
+        public async Task<Channel> GetAsync(string urlOrChannelId, CancellationToken token = default)
         {
             var url = $"{GetChannelUrl(urlOrChannelId)}/about";
             using var request = new HttpRequestMessage(HttpMethod.Get, url);
             SetDefaultHttpRequest(request);
-            using var response = await _httpClient.SendAsync(request, HttpCompletionOption.ResponseHeadersRead);
+            using var response = await _httpClient.SendAsync(request, 
+                HttpCompletionOption.ResponseHeadersRead, token);
             response.EnsureSuccessStatusCode();
+
+            token.ThrowIfCancellationRequested();
             var html = await response.Content.ReadAsStringAsync();
             var extractor = new ChannelPageExtractor(html);
-
             var channel = new Channel
             {
                 Title = extractor.GetTitle(),

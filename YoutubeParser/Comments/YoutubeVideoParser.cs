@@ -3,6 +3,7 @@ using Newtonsoft.Json.Linq;
 using System.Collections.Generic;
 using System.Net.Http;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 using YoutubeParser.Comments;
 
@@ -39,24 +40,28 @@ namespace YoutubeParser.Videos
             };
         }
 
-        public async Task<List<Comment>> GetCommentsListAsync(string urlOrVideoId)
+        public async Task<List<Comment>> GetCommentsListAsync(string urlOrVideoId, CancellationToken token = default)
         {
             var url = $"{GetVideoUrl(urlOrVideoId)}";
             using var request = new HttpRequestMessage(HttpMethod.Get, url);
             SetDefaultHttpRequest(request);
-            using var response = await _httpClient.SendAsync(request, HttpCompletionOption.ResponseHeadersRead);
+            using var response = await _httpClient.SendAsync(request, 
+                HttpCompletionOption.ResponseHeadersRead, token);
             response.EnsureSuccessStatusCode();
+
+            token.ThrowIfCancellationRequested();
             var html = await response.Content.ReadAsStringAsync();
             var extractor = new CommentPageExtractor(html);
             _continuationComment = extractor.TryGetPageContinuation();
             _contextComment = extractor.TryGetInnerTubeContext();
             if (_continuationComment == null)
                 return new List<Comment>();
-            var comments = await GetNextCommentsListAsync();
+            token.ThrowIfCancellationRequested();
+            var comments = await GetNextCommentsListAsync(token);
             return comments ?? new List<Comment>();
         }
 
-        public async Task<List<Comment>?> GetNextCommentsListAsync()
+        public async Task<List<Comment>?> GetNextCommentsListAsync(CancellationToken token = default)
         {
             if (_continuationComment == null)
                 return null;
@@ -73,15 +78,20 @@ namespace YoutubeParser.Videos
             var content = new StringContent(
                 JsonConvert.SerializeObject(payload), Encoding.UTF8, "application/json");
             request.Content = content;
-            using var response = await client.SendAsync(request, HttpCompletionOption.ResponseHeadersRead);
+            using var response = await client.SendAsync(request, 
+                HttpCompletionOption.ResponseHeadersRead, token);
             response.EnsureSuccessStatusCode();
+
+            token.ThrowIfCancellationRequested();
             var json = await response.Content.ReadAsStringAsync();
             var extractor = new CommentPageExtractor(json);
 
+            token.ThrowIfCancellationRequested();
             var comments = new List<Comment>();
             var commentItems = extractor.GetCommentItemsFromNext();
             foreach (var item in commentItems)
             {
+                token.ThrowIfCancellationRequested();
                 comments.Add(MapComment(item));
             }
             // must be after each GetCommentItemsFromNext

@@ -95,9 +95,12 @@ namespace YoutubeParser.Videos
                 return video._isReplay;
             };
 
+            if (token.IsCancellationRequested)
+                return;
+
             var liveChats = await getChatsAsync();
             if (isReplay())
-                return;
+                throw new Exception("Video is not live.");
 
             appends(liveChats);
             await Task.Delay(video._timeoutMs);

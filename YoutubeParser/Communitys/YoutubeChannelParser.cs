@@ -3,6 +3,7 @@ using Newtonsoft.Json.Linq;
 using System.Collections.Generic;
 using System.Net.Http;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 using YoutubeParser.Communitys;
 
@@ -33,20 +34,25 @@ namespace YoutubeParser.Channels
             };
         }
 
-        public async Task<List<Community>> GetCommunitysListAsync(string urlOrChannelId)
+        public async Task<List<Community>> GetCommunitysListAsync(string urlOrChannelId, CancellationToken token = default)
         {
             var url = $"{GetChannelUrl(urlOrChannelId)}/community";
             using var request = new HttpRequestMessage(HttpMethod.Get, url);
             SetDefaultHttpRequest(request);
-            using var response = await _httpClient.SendAsync(request, HttpCompletionOption.ResponseHeadersRead);
+            using var response = await _httpClient.SendAsync(request, 
+                HttpCompletionOption.ResponseHeadersRead, token);
             response.EnsureSuccessStatusCode();
+
+            token.ThrowIfCancellationRequested();
             var html = await response.Content.ReadAsStringAsync();
             var extractor = new CommunityPageExtractor(html);
 
+            token.ThrowIfCancellationRequested();
             var communitys = new List<Community>();
             var communityItems = extractor.GetCommunityItems();
             foreach (var item in communityItems)
             {
+                token.ThrowIfCancellationRequested();
                 communitys.Add(MapCommunity(item));
             }
             // must be after each GetVideoItems
@@ -55,7 +61,7 @@ namespace YoutubeParser.Channels
             return communitys;
         }
 
-        public async Task<List<Community>?> GetNextCommunitysListAsync()
+        public async Task<List<Community>?> GetNextCommunitysListAsync(CancellationToken token = default)
         {
             if (_continuationCommunity == null)
                 return null;
@@ -72,15 +78,20 @@ namespace YoutubeParser.Channels
             var content = new StringContent(
                 JsonConvert.SerializeObject(payload), Encoding.UTF8, "application/json");
             request.Content = content;
-            using var response = await client.SendAsync(request, HttpCompletionOption.ResponseHeadersRead);
+            using var response = await client.SendAsync(request, 
+                HttpCompletionOption.ResponseHeadersRead, token);
             response.EnsureSuccessStatusCode();
+
+            token.ThrowIfCancellationRequested();
             var json = await response.Content.ReadAsStringAsync();
             var extractor = new CommunityPageExtractor(json);
 
+            token.ThrowIfCancellationRequested();
             var communitys = new List<Community>();
             var communityItems = extractor.GetCommunityItemsFromNext();
             foreach (var item in communityItems)
             {
+                token.ThrowIfCancellationRequested();
                 communitys.Add(MapCommunity(item));
             }
             // must be after each GetCommunityItemsFromNext

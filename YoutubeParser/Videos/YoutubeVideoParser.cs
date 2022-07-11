@@ -1,4 +1,5 @@
 ﻿using System.Net.Http;
+using System.Threading;
 using System.Threading.Tasks;
 using YoutubeParser.Shares;
 
@@ -12,13 +13,16 @@ namespace YoutubeParser.Videos
         }
 
         // ----- GetVideo -----
-        public async Task<Video> GetAsync(string urlOrVideoId)
+        public async Task<Video> GetAsync(string urlOrVideoId, CancellationToken token = default)
         {
             var url = $"{GetVideoUrl(urlOrVideoId)}";
             using var request = new HttpRequestMessage(HttpMethod.Get, url);
             SetDefaultHttpRequest(request);
-            using var response = await _httpClient.SendAsync(request, HttpCompletionOption.ResponseHeadersRead);
+            using var response = await _httpClient.SendAsync(request, 
+                HttpCompletionOption.ResponseHeadersRead, token);
             response.EnsureSuccessStatusCode();
+
+            token.ThrowIfCancellationRequested();
             var html = await response.Content.ReadAsStringAsync();
             var extractor = new VideoPageExtractor(html);
 
