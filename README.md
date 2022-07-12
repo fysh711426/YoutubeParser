@@ -29,7 +29,7 @@ PM> Install-Package System.Linq.Async
 `videoId` or `channelId` can use url or id.  
 
 ```C#
-// Each request in client is delay by 1 second
+// Delay 1 second each request in client
 var youtube = new YoutubeClient(() => 1000);
 
 // Get Video

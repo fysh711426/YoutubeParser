@@ -14,7 +14,7 @@ namespace Example
             var channelId = "ChannelUrl or ChannelId";
             var communityId = "CommunityUrl or CommunityId";
 
-            // Each request in client is delay by 1 second
+            // Delay 1 second each request in client
             var youtube = new YoutubeClient(() => 1000);
 
             // Get Video
