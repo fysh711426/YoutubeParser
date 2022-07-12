@@ -2,7 +2,7 @@
 
 This is a library for parsing youtube pages.  
 
-It focus more on channel than other libraries, for example you can use it to get channel videos, live videos, upcoming videos, or community articles.  
+It focus more on channel than other libraries, for example you can use it to get channel videos, live videos, upcoming videos, community articles, super chats, or super thanks.  
 
 ---  
 
