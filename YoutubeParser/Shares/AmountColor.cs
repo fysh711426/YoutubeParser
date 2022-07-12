@@ -6,6 +6,9 @@ using System.Threading.Tasks;
 
 namespace YoutubeParser.Shares
 {
+    /// <summary>
+    /// Super chat color type.
+    /// </summary>
     public enum AmountColor
     {
         DarkBlue,

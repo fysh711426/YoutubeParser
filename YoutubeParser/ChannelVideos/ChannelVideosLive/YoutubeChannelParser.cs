@@ -16,6 +16,12 @@ namespace YoutubeParser.Channels
         private string? _continuationLive;
         private JToken? _contextLive;
 
+        /// <summary>
+        /// Get channel live video list by channel url or id.
+        /// </summary>
+        /// <param name="urlOrChannelId"></param>
+        /// <param name="token"></param>
+        /// <returns></returns>
         public async Task<List<ChannelVideo>> GetLiveListAsync(string urlOrChannelId, CancellationToken token = default)
         {
             var url = $"{GetChannelUrl(urlOrChannelId)}/videos?view=2&live_view=501";
@@ -47,6 +53,11 @@ namespace YoutubeParser.Channels
             return videos;
         }
 
+        /// <summary>
+        /// Get next page channel live video list.
+        /// </summary>
+        /// <param name="token"></param>
+        /// <returns></returns>
         public async Task<List<ChannelVideo>?> GetNextLiveListAsync(CancellationToken token = default)
         {
             if (_continuationLive == null)
@@ -86,6 +97,12 @@ namespace YoutubeParser.Channels
         }
 
 #if (!NET45 && !NET46)
+        /// <summary>
+        /// Merge get and next method, and add delay between request.
+        /// </summary>
+        /// <param name="urlOrChannelId"></param>
+        /// <param name="token"></param>
+        /// <returns></returns>
         public async IAsyncEnumerable<ChannelVideo> GetLiveAsync(string urlOrChannelId, 
             [EnumeratorCancellation] CancellationToken token = default)
         {

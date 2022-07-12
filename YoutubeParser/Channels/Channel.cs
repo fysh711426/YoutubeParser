@@ -13,9 +13,17 @@ namespace YoutubeParser.Channels
         public string Description { get; set; } = "";
         public DateTime? JoinedDate { get; set; }
         public string Country { get; set; } = "";
-        public string CanonicalChannelUrl { get; set; } = "";
         public long ViewCount { get; set; }
         public long SubscriberCount { get; set; }
+
+        /// <summary>
+        /// https://www.youtube.com/c/{userDefined}
+        /// </summary>
+        public string CanonicalChannelUrl { get; set; } = "";
+
+        /// <summary>
+        /// https://www.youtube.com/channel/{channelId}
+        /// </summary>
         public string Url => $"https://www.youtube.com/channel/{ChannelId}";
     }
 }

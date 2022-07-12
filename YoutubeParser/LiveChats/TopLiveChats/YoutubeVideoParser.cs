@@ -28,6 +28,12 @@ namespace YoutubeParser.Videos
             return liveChat;
         }
 
+        /// <summary>
+        /// Get video top chat list by video url or id.
+        /// </summary>
+        /// <param name="urlOrVideoId"></param>
+        /// <param name="token"></param>
+        /// <returns></returns>
         public async Task<List<LiveChat>> GetTopChatsListAsync(string urlOrVideoId, CancellationToken token = default)
         {
             _topLiveChatDict = new();
@@ -56,6 +62,12 @@ namespace YoutubeParser.Videos
         }
 
         private Dictionary<string, LiveChat> _topLiveChatDict = new();
+
+        /// <summary>
+        /// Get next page video top chat list.
+        /// </summary>
+        /// <param name="token"></param>
+        /// <returns></returns>
         public async Task<List<LiveChat>?> GetNextTopChatsListAsync(CancellationToken token = default)
         {
             if (_continuationTopLiveChat == null)
@@ -128,6 +140,12 @@ namespace YoutubeParser.Videos
         }
 
 #if (!NET45 && !NET46)
+        /// <summary>
+        /// Merge get and next method, and add delay between request.
+        /// </summary>
+        /// <param name="urlOrCommunityId"></param>
+        /// <param name="token"></param>
+        /// <returns></returns>
         public async IAsyncEnumerable<LiveChat> GetTopChatsAsync(string urlOrCommunityId,
             [EnumeratorCancellation] CancellationToken token = default)
         {

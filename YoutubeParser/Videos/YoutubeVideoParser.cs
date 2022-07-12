@@ -15,6 +15,13 @@ namespace YoutubeParser.Videos
         }
 
         // ----- GetVideo -----
+
+        /// <summary>
+        /// Get video info by video url or id.
+        /// </summary>
+        /// <param name="urlOrVideoId"></param>
+        /// <param name="token"></param>
+        /// <returns></returns>
         public async Task<Video> GetAsync(string urlOrVideoId, CancellationToken token = default)
         {
             var url = $"{GetVideoUrl(urlOrVideoId)}";

@@ -41,6 +41,12 @@ namespace YoutubeParser.Videos
             };
         }
 
+        /// <summary>
+        /// Get video comment list by video url or id.
+        /// </summary>
+        /// <param name="urlOrVideoId"></param>
+        /// <param name="token"></param>
+        /// <returns></returns>
         public async Task<List<Comment>> GetCommentsListAsync(string urlOrVideoId, CancellationToken token = default)
         {
             var url = $"{GetVideoUrl(urlOrVideoId)}";
@@ -62,6 +68,11 @@ namespace YoutubeParser.Videos
             return comments ?? new List<Comment>();
         }
 
+        /// <summary>
+        /// Get next page video comment list.
+        /// </summary>
+        /// <param name="token"></param>
+        /// <returns></returns>
         public async Task<List<Comment>?> GetNextCommentsListAsync(CancellationToken token = default)
         {
             if (_continuationComment == null)
@@ -101,6 +112,12 @@ namespace YoutubeParser.Videos
         }
 
 #if (!NET45 && !NET46)
+        /// <summary>
+        /// Merge get and next method, and add delay between request.
+        /// </summary>
+        /// <param name="urlOrCommunityId"></param>
+        /// <param name="token"></param>
+        /// <returns></returns>
         public async IAsyncEnumerable<Comment> GetCommentsAsync(string urlOrCommunityId,
             [EnumeratorCancellation] CancellationToken token = default)
         {

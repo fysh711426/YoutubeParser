@@ -15,6 +15,13 @@ namespace YoutubeParser.Channels
         }
 
         // ----- GetChannel -----
+
+        /// <summary>
+        /// Get channel info by channel url or id.
+        /// </summary>
+        /// <param name="urlOrChannelId"></param>
+        /// <param name="token"></param>
+        /// <returns></returns>
         public async Task<Channel> GetAsync(string urlOrChannelId, CancellationToken token = default)
         {
             var url = $"{GetChannelUrl(urlOrChannelId)}/about";

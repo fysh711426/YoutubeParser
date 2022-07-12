@@ -16,6 +16,14 @@ namespace YoutubeParser.Communitys
         }
 
         // ----- GetCommunity -----
+
+        /// <summary>
+        /// Get community info by community url or id.
+        /// </summary>
+        /// <param name="urlOrCommunityId"></param>
+        /// <param name="token"></param>
+        /// <returns></returns>
+        /// <exception cref="Exception"></exception>
         public async Task<Community> GetAsync(string urlOrCommunityId, CancellationToken token = default)
         {
             var url = $"{GetCommunityUrl(urlOrCommunityId)}";

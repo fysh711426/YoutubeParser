@@ -35,6 +35,12 @@ namespace YoutubeParser.Channels
             };
         }
 
+        /// <summary>
+        /// Get channel community list by channel url or id.
+        /// </summary>
+        /// <param name="urlOrChannelId"></param>
+        /// <param name="token"></param>
+        /// <returns></returns>
         public async Task<List<Community>> GetCommunitysListAsync(string urlOrChannelId, CancellationToken token = default)
         {
             var url = $"{GetChannelUrl(urlOrChannelId)}/community";
@@ -62,6 +68,11 @@ namespace YoutubeParser.Channels
             return communitys;
         }
 
+        /// <summary>
+        /// Get next page channel community list.
+        /// </summary>
+        /// <param name="token"></param>
+        /// <returns></returns>
         public async Task<List<Community>?> GetNextCommunitysListAsync(CancellationToken token = default)
         {
             if (_continuationCommunity == null)
@@ -101,6 +112,12 @@ namespace YoutubeParser.Channels
         }
 
 #if (!NET45 && !NET46)
+        /// <summary>
+        /// Merge get and next method, and add delay between request.
+        /// </summary>
+        /// <param name="urlOrChannelId"></param>
+        /// <param name="token"></param>
+        /// <returns></returns>
         public async IAsyncEnumerable<Community> GetCommunitysAsync(string urlOrChannelId,
             [EnumeratorCancellation] CancellationToken token = default)
         {

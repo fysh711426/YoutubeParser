@@ -36,6 +36,12 @@ namespace YoutubeParser.Channels
             };
         }
 
+        /// <summary>
+        /// Get channel video list by channel url or id.
+        /// </summary>
+        /// <param name="urlOrChannelId"></param>
+        /// <param name="token"></param>
+        /// <returns></returns>
         public async Task<List<ChannelVideo>> GetVideosListAsync(string urlOrChannelId, CancellationToken token = default)
         {
             var url = $"{GetChannelUrl(urlOrChannelId)}/videos";
@@ -63,6 +69,11 @@ namespace YoutubeParser.Channels
             return videos;
         }
 
+        /// <summary>
+        /// Get next page channel video list.
+        /// </summary>
+        /// <param name="token"></param>
+        /// <returns></returns>
         public async Task<List<ChannelVideo>?> GetNextVideosListAsync(CancellationToken token = default)
         {
             if (_continuation == null)
@@ -102,6 +113,12 @@ namespace YoutubeParser.Channels
         }
 
 #if (!NET45 && !NET46)
+        /// <summary>
+        /// Merge get and next method, and add delay between request.
+        /// </summary>
+        /// <param name="urlOrChannelId"></param>
+        /// <param name="token"></param>
+        /// <returns></returns>
         public async IAsyncEnumerable<ChannelVideo> GetVideosAsync(string urlOrChannelId,
             [EnumeratorCancellation] CancellationToken token = default)
         {

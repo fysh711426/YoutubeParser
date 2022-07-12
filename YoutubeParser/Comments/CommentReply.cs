@@ -12,9 +12,18 @@ namespace YoutubeParser.Comments
     {
         public string CommentId { get; set; } = "";
         public string Content { get; set; } = "";
-        public string PublishedTime { get; set; } = "";
-        public long PublishedTimeSeconds { get; set; }
         public long LikeCount { get; set; }
+
+        /// <summary>
+        /// Comment published time text.
+        /// </summary>
+        public string PublishedTime { get; set; } = "";
+
+        /// <summary>
+        /// Seconds value of PublishedTime, not accurate.
+        /// </summary>
+        public long PublishedTimeSeconds { get; set; }
+
         public string AuthorTitle { get; set; } = "";
         public string AuthorChannelId { get; set; } = "";
         public IReadOnlyList<Thumbnail> AuthorThumbnails { get; set; } = new List<Thumbnail>();

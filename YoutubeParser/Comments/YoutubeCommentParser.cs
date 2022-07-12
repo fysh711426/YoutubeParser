@@ -41,6 +41,12 @@ namespace YoutubeParser.Comments
             };
         }
 
+        /// <summary>
+        /// Get comment reply list by comment object.
+        /// </summary>
+        /// <param name="comment"></param>
+        /// <param name="token"></param>
+        /// <returns></returns>
         public async Task<List<CommentReply>> GetRepliesListAsync(Comment comment, CancellationToken token = default)
         {
             _contextReply = comment._context;
@@ -53,6 +59,11 @@ namespace YoutubeParser.Comments
             return comments ?? new List<CommentReply>();
         }
 
+        /// <summary>
+        /// Get next page comment reply list.
+        /// </summary>
+        /// <param name="token"></param>
+        /// <returns></returns>
         public async Task<List<CommentReply>?> GetNextRepliesListAsync(CancellationToken token = default)
         {
             if (_continuationReply == null)
@@ -92,6 +103,12 @@ namespace YoutubeParser.Comments
         }
 
 #if (!NET45 && !NET46)
+        /// <summary>
+        /// Merge get and next method, and add delay between request.
+        /// </summary>
+        /// <param name="comment"></param>
+        /// <param name="token"></param>
+        /// <returns></returns>
         public async IAsyncEnumerable<CommentReply> GetRepliesAsync(Comment comment,
             [EnumeratorCancellation] CancellationToken token = default)
         {

@@ -10,12 +10,26 @@ namespace YoutubeParser.Videos
 {
     public partial class YoutubeVideoParser
     {
+        /// <summary>
+        /// Receive video top chat push by video url or id.
+        /// </summary>
+        /// <param name="urlOrVideoId"></param>
+        /// <param name="callback"></param>
+        /// <param name="token"></param>
+        /// <returns></returns>
         public async Task OnTopChatsAsync(string urlOrVideoId,
             Action<LiveChat> callback, CancellationToken token = default)
         {
             await OnLiveChatsHandlerAsync(true, urlOrVideoId, callback, token);
         }
 
+        /// <summary>
+        /// Receive video live chat push by video url or id.
+        /// </summary>
+        /// <param name="urlOrVideoId"></param>
+        /// <param name="callback"></param>
+        /// <param name="token"></param>
+        /// <returns></returns>
         public async Task OnLiveChatsAsync(string urlOrVideoId,
             Action<LiveChat> callback, CancellationToken token = default)
         {
