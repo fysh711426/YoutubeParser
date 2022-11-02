@@ -1,5 +1,6 @@
 ﻿using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
+using System;
 using System.Collections.Generic;
 using System.Net.Http;
 using System.Runtime.CompilerServices;
@@ -22,6 +23,7 @@ namespace YoutubeParser.Channels
         /// <param name="urlOrChannelId"></param>
         /// <param name="token"></param>
         /// <returns></returns>
+        [Obsolete]
         public async Task<List<ChannelVideo>> GetUpcomingLiveListAsync(string urlOrChannelId, CancellationToken token = default)
         {
             var url = $"{GetChannelUrl(urlOrChannelId)}/videos?view=2&live_view=502";
@@ -58,6 +60,7 @@ namespace YoutubeParser.Channels
         /// </summary>
         /// <param name="token"></param>
         /// <returns></returns>
+        [Obsolete]
         public async Task<List<ChannelVideo>?> GetNextUpcomingLiveListAsync(CancellationToken token = default)
         {
             if (_continuationUpcomingLive == null)
@@ -103,6 +106,7 @@ namespace YoutubeParser.Channels
         /// <param name="urlOrChannelId"></param>
         /// <param name="token"></param>
         /// <returns></returns>
+        [Obsolete]
         public async IAsyncEnumerable<ChannelVideo> GetUpcomingLiveAsync(string urlOrChannelId,
             [EnumeratorCancellation] CancellationToken token = default)
         {

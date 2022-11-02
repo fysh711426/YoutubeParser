@@ -21,9 +21,7 @@ namespace YoutubeParser.ChannelVideos
         );
 
         private IEnumerable<JObject?> GetVideoGrids() => Memo.Cache(this, () =>
-            TryGetSelectedTab()?["tabRenderer"]?["content"]?["sectionListRenderer"]?["contents"]?
-                .FirstOrDefault()?["itemSectionRenderer"]?["contents"]?
-                .FirstOrDefault()?["gridRenderer"]?["items"]?
+            TryGetSelectedTab()?["tabRenderer"]?["content"]?["richGridRenderer"]?["contents"]?
                 .Values<JObject>() ?? new List<JObject>()
         );
 
@@ -42,9 +40,13 @@ namespace YoutubeParser.ChannelVideos
             var grids = GetVideoGrids();
             foreach (var grid in grids)
             {
-                if (grid?.ContainsKey("gridVideoRenderer") == true)
+                if (grid?.ContainsKey("richItemRenderer") == true)
                 {
-                    var gridVideo = grid["gridVideoRenderer"];
+                    var gridVideo =
+                        // Video and Stream
+                        grid["richItemRenderer"]?["content"]?["videoRenderer"] ??
+                        // Shorts
+                        grid["richItemRenderer"]?["content"]?["reelItemRenderer"];
                     if (gridVideo != null)
                     {
                         yield return gridVideo;
@@ -68,9 +70,13 @@ namespace YoutubeParser.ChannelVideos
             var grids = GetVideoGridsFromNext();
             foreach (var grid in grids)
             {
-                if (grid?.ContainsKey("gridVideoRenderer") == true)
+                if (grid?.ContainsKey("richItemRenderer") == true)
                 {
-                    var gridVideo = grid["gridVideoRenderer"];
+                    var gridVideo = 
+                        // Video and Stream
+                        grid["richItemRenderer"]?["content"]?["videoRenderer"] ??
+                        // Shorts
+                        grid["richItemRenderer"]?["content"]?["reelItemRenderer"];
                     if (gridVideo != null)
                     {
                         yield return gridVideo;

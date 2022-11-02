@@ -1,6 +1,5 @@
 ﻿using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
-using System;
 using System.Collections.Generic;
 using System.Net.Http;
 using System.Runtime.CompilerServices;
@@ -13,20 +12,19 @@ namespace YoutubeParser.Channels
 {
     public partial class YoutubeChannelParser
     {
-        // ----- GetVideos -----
-        private string? _continuationLive;
-        private JToken? _contextLive;
+        // ----- GetStreams -----
+        private string? _continuationStream;
+        private JToken? _contextStream;
 
         /// <summary>
-        /// Get channel live video list by channel url or id.
+        /// Get channel stream video list by channel url or id.
         /// </summary>
         /// <param name="urlOrChannelId"></param>
         /// <param name="token"></param>
         /// <returns></returns>
-        [Obsolete]
-        public async Task<List<ChannelVideo>> GetLiveListAsync(string urlOrChannelId, CancellationToken token = default)
+        public async Task<List<ChannelVideo>> GetStreamsListAsync(string urlOrChannelId, CancellationToken token = default)
         {
-            var url = $"{GetChannelUrl(urlOrChannelId)}/videos?view=2&live_view=501";
+            var url = $"{GetChannelUrl(urlOrChannelId)}/streams";
             using var request = new HttpRequestMessage(HttpMethod.Get, url);
             SetDefaultHttpRequest(request);
             using var response = await _httpClient.SendAsync(request, 
@@ -38,10 +36,6 @@ namespace YoutubeParser.Channels
             var extractor = new ChannelVideoPageExtractor(html);
 
             token.ThrowIfCancellationRequested();
-            var subMenuTitle = extractor.GetSelectedSubMenuTitle();
-            if (subMenuTitle != "Live now")
-                return new List<ChannelVideo>();
-
             var videos = new List<ChannelVideo>();
             var videoItems = extractor.GetVideoItems();
             foreach (var item in videoItems)
@@ -50,20 +44,19 @@ namespace YoutubeParser.Channels
                 videos.Add(MapVideo(item));
             }
             // must be after each GetVideoItems
-            _continuationLive = extractor.TryGetContinuation();
-            _contextLive = extractor.TryGetInnerTubeContext();
+            _continuationStream = extractor.TryGetContinuation();
+            _contextStream = extractor.TryGetInnerTubeContext();
             return videos;
         }
 
         /// <summary>
-        /// Get next page channel live video list.
+        /// Get next page channel stream video list.
         /// </summary>
         /// <param name="token"></param>
         /// <returns></returns>
-        [Obsolete]
-        public async Task<List<ChannelVideo>?> GetNextLiveListAsync(CancellationToken token = default)
+        public async Task<List<ChannelVideo>?> GetNextStreamsListAsync(CancellationToken token = default)
         {
-            if (_continuationLive == null)
+            if (_continuationStream == null)
                 return null;
 
             var apiUrl = $"https://www.youtube.com/youtubei/v1/browse?key={apiKey}";
@@ -72,8 +65,8 @@ namespace YoutubeParser.Channels
             using var request = new HttpRequestMessage(HttpMethod.Post, apiUrl);
             var payload = new
             {
-                context = _contextLive,
-                continuation = _continuationLive
+                context = _contextStream,
+                continuation = _continuationStream
             };
             var content = new StringContent(
                 JsonConvert.SerializeObject(payload), Encoding.UTF8, "application/json");
@@ -95,7 +88,7 @@ namespace YoutubeParser.Channels
                 videos.Add(MapVideo(item));
             }
             // must be after each GetVideoItemsFromNext
-            _continuationLive = extractor.TryGetContinuation();
+            _continuationStream = extractor.TryGetContinuation();
             return videos;
         }
 
@@ -106,11 +99,10 @@ namespace YoutubeParser.Channels
         /// <param name="urlOrChannelId"></param>
         /// <param name="token"></param>
         /// <returns></returns>
-        [Obsolete]
-        public async IAsyncEnumerable<ChannelVideo> GetLiveAsync(string urlOrChannelId, 
+        public async IAsyncEnumerable<ChannelVideo> GetStreamsAsync(string urlOrChannelId,
             [EnumeratorCancellation] CancellationToken token = default)
         {
-            var videos = await GetLiveListAsync(urlOrChannelId, token);
+            var videos = await GetStreamsListAsync(urlOrChannelId, token);
             foreach (var item in videos)
             {
                 token.ThrowIfCancellationRequested();
@@ -121,7 +113,7 @@ namespace YoutubeParser.Channels
                 token.ThrowIfCancellationRequested();
                 if (_requestDelay != null)
                     await Task.Delay(_requestDelay(), token);
-                var nextVideos = await GetNextLiveListAsync(token);
+                var nextVideos = await GetNextStreamsListAsync(token);
                 if (nextVideos == null)
                     break;
                 foreach (var item in nextVideos)
@@ -132,6 +124,6 @@ namespace YoutubeParser.Channels
             }
         }
 #endif
-        // ----- GetVideos -----
+        // ----- GetStreams -----
     }
 }

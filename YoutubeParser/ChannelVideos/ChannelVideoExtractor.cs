@@ -33,7 +33,10 @@ namespace YoutubeParser.ChannelVideos
         );
 
         private string? TryGetPublishedTime() => Memo.Cache(this, () =>
-            _content["publishedTimeText"]?["simpleText"]?.Value<string>()
+            // Video or Stream
+            _content["publishedTimeText"]?["simpleText"]?.Value<string>() ??
+            // Short
+            _content["navigationEndpoint"]?["reelWatchEndpoint"]?["overlay"]?["reelPlayerOverlayRenderer"]?["reelPlayerHeaderSupportedRenderers"]?["reelPlayerHeaderRenderer"]?["timestampText"]?["simpleText"]?.Value<string>()
         );
 
         public string? TryGetUpcomingStartTimeText() => Memo.Cache(this, () =>
@@ -86,11 +89,15 @@ namespace YoutubeParser.ChannelVideos
         );
 
         public bool IsShorts() => Memo.Cache(this, () =>
-            TryGetDurationText() == "SHORTS"
+            //TryGetDurationText() == "SHORTS"
+            _content["headline"] != null
         );
 
         public string GetTitle() => Memo.Cache(this, () =>
-            _content["title"]?["runs"]?.FirstOrDefault()?["text"]?.Value<string>() ?? ""
+            // Video or Stream
+            _content["title"]?["runs"]?.FirstOrDefault()?["text"]?.Value<string>() ??
+            // Short
+            _content["headline"]?["simpleText"]?.Value<string>() ?? ""
         );
 
         public string GetVideoId() => Memo.Cache(this, () =>

@@ -80,7 +80,25 @@ while (true)
 
 ---  
 
-#### Get Live Streams Videos  
+#### Get Channel Streams  
+
+```C#
+var streams = await youtube.Channel
+    .GetStreamsAsync(channelId)
+    .ToListAsync();
+```
+
+#### Get Channel Shorts  
+
+```C#
+var shorts = await youtube.Channel
+    .GetShortsAsync(channelId)
+    .ToListAsync();
+```
+
+---  
+
+#### Get Live Streams Videos [Obsolete]  
 
 ```C#
 var liveStreams = await youtube.Channel
@@ -88,7 +106,7 @@ var liveStreams = await youtube.Channel
     .ToListAsync();
 ```
 
-#### Get Upcoming Live Streams Videos  
+#### Get Upcoming Live Streams Videos [Obsolete]  
 
 ```C#
 var upcomingLiveStreams = await youtube.Channel
@@ -116,6 +134,19 @@ var videoComments = await youtube.Video
     .ToListAsync();
 ```
 
+#### Get Video Comment Replies  
+```C#
+foreach (var comment in videoComments)
+{
+    if (comment.ReplyCount > 0)
+    {
+        comment.Replies = await youtube.Comment
+            .GetRepliesAsync(comment)
+            .ToListAsync();
+    }
+}
+```
+
 #### Get Community Comments  
 
 ```C#
@@ -124,13 +155,10 @@ var communityComments = await youtube.Community
     .ToListAsync();
 ```
 
-#### Get Comment Replies  
+#### Get Community Comment Replies  
 
 ```C#
-var comments = await youtube.Video
-    .GetCommentsAsync(videoId)
-    .ToListAsync();
-foreach (var comment in comments)
+foreach (var comment in communityComments)
 {
     if (comment.ReplyCount > 0)
     {
@@ -186,18 +214,7 @@ await youtube.Video.OnLiveChatsAsync(videoId, (item) =>
 
 ### Parameters  
 
-* You can use parameters to filter video list.  
-
-#### Get all past live streams  
-
-```C#
-var pastLiveStreams = await youtube.Channel
-    .GetVideosAsync(channelId)
-    .Where(it =>
-        it.VideoType == VideoType.Stream &&
-        it.VideoStatus == VideoStatus.Default)
-    .ToListAsync();
-```
+You can use parameters to filter video list.  
 
 * VideoType 
 
@@ -214,18 +231,15 @@ var pastLiveStreams = await youtube.Channel
  Live     | Streaming or Premiering
  Upcoming | Scheduled or Premieres
 
----  
-
-#### Get shorts videos  
+#### Get live stream  
 
 ```C#
-var shortsVideos = await youtube.Channel
-    .GetVideosAsync(channelId)
-    .Where(it => it.IsShorts)
+var liveStreams = await youtube.Channel
+    .GetStreamsAsync(channelId)
+    .BreakOnNext(it => it.VideoStatus == VideoStatus.Live)
+    .Where(it => it.VideoStatus == VideoStatus.Live)
     .ToListAsync();
 ```
-
----  
 
 #### Get videos in last month  
 
@@ -251,8 +265,6 @@ public static async IAsyncEnumerable<T> BreakOn<T>(
 }
 ```
 
----  
-
 #### Get super thanks  
 
 ```C#
@@ -261,8 +273,6 @@ var superThanks = await youtube.Video
     .Where(it => it.CommentType == CommentType.SuperThanks)
     .ToListAsync();
 ```
-
----  
 
 #### Get super chats  
 

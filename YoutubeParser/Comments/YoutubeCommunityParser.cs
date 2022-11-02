@@ -16,10 +16,10 @@ namespace YoutubeParser.Communitys
         private string? _continuationComment;
         private JToken? _contextComment;
 
-        private Comment MapComment(JToken content)
+        private CommunityComment MapComment(JToken content)
         {
             var extractor = new CommentExtractor(content);
-            return new Comment
+            return new CommunityComment
             {
                 CommentId = extractor.GetCommentId(),
                 Content = extractor.GetContent(),
@@ -44,7 +44,7 @@ namespace YoutubeParser.Communitys
         /// <param name="urlOrCommunityId"></param>
         /// <param name="token"></param>
         /// <returns></returns>
-        public async Task<List<Comment>> GetCommentsListAsync(string urlOrCommunityId, CancellationToken token = default)
+        public async Task<List<CommunityComment>> GetCommentsListAsync(string urlOrCommunityId, CancellationToken token = default)
         {
             var url = $"{GetCommunityUrl(urlOrCommunityId)}";
             using var request = new HttpRequestMessage(HttpMethod.Get, url);
@@ -59,10 +59,10 @@ namespace YoutubeParser.Communitys
             _continuationComment = extractor.TryGetPageContinuation();
             _contextComment = extractor.TryGetInnerTubeContext();
             if (_continuationComment == null)
-                return new List<Comment>();
+                return new List<CommunityComment>();
             token.ThrowIfCancellationRequested();
             var comments = await GetNextCommentsListAsync(token);
-            return comments ?? new List<Comment>();
+            return comments ?? new List<CommunityComment>();
         }
 
         /// <summary>
@@ -70,7 +70,7 @@ namespace YoutubeParser.Communitys
         /// </summary>
         /// <param name="token"></param>
         /// <returns></returns>
-        public async Task<List<Comment>?> GetNextCommentsListAsync(CancellationToken token = default)
+        public async Task<List<CommunityComment>?> GetNextCommentsListAsync(CancellationToken token = default)
         {
             if (_continuationComment == null)
                 return null;
@@ -96,7 +96,7 @@ namespace YoutubeParser.Communitys
             var extractor = new CommentPageExtractor(json);
 
             token.ThrowIfCancellationRequested();
-            var comments = new List<Comment>();
+            var comments = new List<CommunityComment>();
             var commentItems = extractor.GetCommentItemsFromNext();
             foreach (var item in commentItems)
             {
@@ -115,7 +115,7 @@ namespace YoutubeParser.Communitys
         /// <param name="urlOrCommunityId"></param>
         /// <param name="token"></param>
         /// <returns></returns>
-        public async IAsyncEnumerable<Comment> GetCommentsAsync(string urlOrCommunityId,
+        public async IAsyncEnumerable<CommunityComment> GetCommentsAsync(string urlOrCommunityId,
             [EnumeratorCancellation] CancellationToken token = default)
         {
             var comments = await GetCommentsListAsync(urlOrCommunityId, token);

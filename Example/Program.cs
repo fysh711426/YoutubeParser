@@ -43,15 +43,25 @@ namespace Example
                 .GetVideosAsync(channelId)
                 .ToListAsync();
 
-            // Get Live Streams Videos
-            var liveStreams = await youtube.Channel
-                .GetLiveAsync(channelId)
+            // Get Channel Streams
+            var streams = await youtube.Channel
+                .GetStreamsAsync(channelId)
                 .ToListAsync();
 
-            // Get Upcoming Live Streams Videos
-            var upcomingLiveStreams = await youtube.Channel
-                .GetUpcomingLiveAsync(channelId)
+            // Get Channel Shorts
+            var shorts = await youtube.Channel
+                .GetShortsAsync(channelId)
                 .ToListAsync();
+
+            // Get Live Streams Videos [Obsolete]
+            //var liveStreams = await youtube.Channel
+            //    .GetLiveAsync(channelId)
+            //    .ToListAsync();
+
+            // Get Upcoming Live Streams Videos [Obsolete]
+            //var upcomingLiveStreams = await youtube.Channel
+            //    .GetUpcomingLiveAsync(channelId)
+            //    .ToListAsync();
 
             // Get Channel Communitys
             var communitys = await youtube.Channel
@@ -63,16 +73,24 @@ namespace Example
                 .GetCommentsAsync(videoId)
                 .ToListAsync();
 
+            // Get Video Comment Replies
+            foreach (var comment in videoComments)
+            {
+                if (comment.ReplyCount > 0)
+                {
+                    comment.Replies = await youtube.Comment
+                        .GetRepliesAsync(comment)
+                        .ToListAsync();
+                }
+            }
+
             // Get Community Comments
             var communityComments = await youtube.Community
                 .GetCommentsAsync(communityId)
                 .ToListAsync();
 
-            // Get Comment Replies
-            var comments = await youtube.Video
-                .GetCommentsAsync(videoId)
-                .ToListAsync();
-            foreach (var comment in comments)
+            // Get Community Comment Replies
+            foreach (var comment in communityComments)
             {
                 if (comment.ReplyCount > 0)
                 {
@@ -104,12 +122,11 @@ namespace Example
                 // do something
             });
 
-            // Get all past live streams
-            var pastLiveStreams = await youtube.Channel
-                .GetVideosAsync(channelId)
-                .Where(it =>
-                    it.VideoType == VideoType.Stream &&
-                    it.VideoStatus == VideoStatus.Default)
+            // Get live stream
+            var liveStreams = await youtube.Channel
+                .GetStreamsAsync(channelId)
+                .BreakOnNext(it => it.VideoStatus == VideoStatus.Live)
+                .Where(it => it.VideoStatus == VideoStatus.Live)
                 .ToListAsync();
 
             // Get shorts videos

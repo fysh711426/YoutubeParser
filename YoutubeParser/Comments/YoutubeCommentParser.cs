@@ -7,7 +7,6 @@ using System.Runtime.CompilerServices;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
-using YoutubeParser.Comments;
 using YoutubeParser.Shares;
 
 namespace YoutubeParser.Comments
@@ -21,6 +20,13 @@ namespace YoutubeParser.Comments
         }
 
         // ----- GetCommentReplies -----
+
+        private enum CommentType
+        {
+            Video,
+            Community
+        }
+        private CommentType _commentType;
         private string? _continuationReply;
         private JToken? _contextReply;
 
@@ -42,12 +48,30 @@ namespace YoutubeParser.Comments
         }
 
         /// <summary>
-        /// Get comment reply list by comment object.
+        /// Get video comment reply list by comment object.
         /// </summary>
         /// <param name="comment"></param>
         /// <param name="token"></param>
         /// <returns></returns>
-        public async Task<List<CommentReply>> GetRepliesListAsync(Comment comment, CancellationToken token = default)
+        public async Task<List<CommentReply>> GetRepliesListAsync(VideoComment comment, CancellationToken token = default)
+        {
+            _commentType = CommentType.Video;
+            return await _GetRepliesListAsync(comment, token);
+        }
+
+        /// <summary>
+        /// Get community comment reply list by comment object.
+        /// </summary>
+        /// <param name="comment"></param>
+        /// <param name="token"></param>
+        /// <returns></returns>
+        public async Task<List<CommentReply>> GetRepliesListAsync(CommunityComment comment, CancellationToken token = default)
+        {
+            _commentType = CommentType.Community;
+            return await _GetRepliesListAsync(comment, token);
+        }
+
+        private async Task<List<CommentReply>> _GetRepliesListAsync(Comment comment, CancellationToken token = default)
         {
             _contextReply = comment._context;
             _continuationReply = comment._continuation;
@@ -68,8 +92,10 @@ namespace YoutubeParser.Comments
         {
             if (_continuationReply == null)
                 return null;
-
+            
             var apiUrl = $"https://www.youtube.com/youtubei/v1/browse?key={apiKey}";
+            if (_commentType == CommentType.Video)
+                apiUrl = $"https://www.youtube.com/youtubei/v1/next?key={apiKey}";
             var client = _httpClient;
 
             using var request = new HttpRequestMessage(HttpMethod.Post, apiUrl);
@@ -109,7 +135,38 @@ namespace YoutubeParser.Comments
         /// <param name="comment"></param>
         /// <param name="token"></param>
         /// <returns></returns>
-        public async IAsyncEnumerable<CommentReply> GetRepliesAsync(Comment comment,
+        public async IAsyncEnumerable<CommentReply> GetRepliesAsync(VideoComment comment,
+            [EnumeratorCancellation] CancellationToken token = default)
+        {
+            var comments = await GetRepliesListAsync(comment, token);
+            foreach (var item in comments)
+            {
+                token.ThrowIfCancellationRequested();
+                yield return item;
+            }
+            while (true)
+            {
+                token.ThrowIfCancellationRequested();
+                if (_requestDelay != null)
+                    await Task.Delay(_requestDelay(), token);
+                var nextComments = await GetNextRepliesListAsync(token);
+                if (nextComments == null)
+                    break;
+                foreach (var item in nextComments)
+                {
+                    token.ThrowIfCancellationRequested();
+                    yield return item;
+                }
+            }
+        }
+
+        /// <summary>
+        /// Merge get and next method, and add delay between request.
+        /// </summary>
+        /// <param name="comment"></param>
+        /// <param name="token"></param>
+        /// <returns></returns>
+        public async IAsyncEnumerable<CommentReply> GetRepliesAsync(CommunityComment comment,
             [EnumeratorCancellation] CancellationToken token = default)
         {
             var comments = await GetRepliesListAsync(comment, token);
