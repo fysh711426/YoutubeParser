@@ -123,17 +123,10 @@ namespace Example
             });
 
             // Get live stream
-            var liveStreams = await youtube.Channel
+            var liveStream = await youtube.Channel
                 .GetStreamsAsync(channelId)
-                .BreakOnNext(it => it.VideoStatus == VideoStatus.Live)
-                .Where(it => it.VideoStatus == VideoStatus.Live)
-                .ToListAsync();
-
-            // Get shorts videos
-            var shortsVideos = await youtube.Channel
-                .GetVideosAsync(channelId)
-                .Where(it => it.IsShorts)
-                .ToListAsync();
+                .FirstOrDefaultAsync(it => 
+                    it.VideoStatus == VideoStatus.Live);
 
             // Get videos in last month
             var inLastMonth = await youtube.Channel
@@ -149,13 +142,13 @@ namespace Example
             
             // Get super chats
             var superChats = await youtube.Video
-                .GetTopChatsAsync(videoId)
+                .GetLiveChatsAsync(videoId)
                 .Where(it => it.LiveChatType == LiveChatType.SuperChat)
                 .ToListAsync();
 
             // Get gift chats
             var giftChats = await youtube.Video
-                .GetTopChatsAsync(videoId)
+                .GetLiveChatsAsync(videoId)
                 .Where(it => it.LiveChatType == LiveChatType.Gift)
                 .ToListAsync();
         }
