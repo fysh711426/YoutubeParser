@@ -46,7 +46,7 @@ namespace YoutubeParser.ChannelVideos
                         // Video and Stream
                         grid["richItemRenderer"]?["content"]?["videoRenderer"] ??
                         // Shorts
-                        grid["richItemRenderer"]?["content"]?["reelItemRenderer"];
+                        grid["richItemRenderer"]?["content"]?["shortsLockupViewModel"];
                     if (gridVideo != null)
                     {
                         yield return gridVideo;
@@ -76,7 +76,7 @@ namespace YoutubeParser.ChannelVideos
                         // Video and Stream
                         grid["richItemRenderer"]?["content"]?["videoRenderer"] ??
                         // Shorts
-                        grid["richItemRenderer"]?["content"]?["reelItemRenderer"];
+                        grid["richItemRenderer"]?["content"]?["shortsLockupViewModel"];
                     if (gridVideo != null)
                     {
                         yield return gridVideo;

@@ -1,6 +1,7 @@
 ﻿using Newtonsoft.Json.Linq;
 using System.Collections.Generic;
 using System.Linq;
+using System.Xml.Linq;
 using YoutubeParser.Shares;
 using YoutubeParser.Utils;
 
@@ -51,6 +52,11 @@ namespace YoutubeParser.Comments
                 .TryGetJsonResponse()?["onResponseReceivedEndpoints"]
         );
 
+        private JToken? TryFrameworkUpdates() => Memo.Cache(this, () =>
+            new YoutubePageExtractor(_html)
+                .TryGetJsonResponse()?["frameworkUpdates"]?["entityBatchUpdate"]?["mutations"]
+        );
+
         // For GetNextCommentsList
         private IEnumerable<JObject?> GetCommentContentsFromNext() => Memo.Cache(this, () =>
             TryGetResponseReceived()?.Values<JObject>()
@@ -60,18 +66,33 @@ namespace YoutubeParser.Comments
             new List<JObject>()
         );
 
+        private IEnumerable<JObject?> GetCommentContentsFromNextUpdate() => Memo.Cache(this, () =>
+            TryFrameworkUpdates()?.Values<JObject>()?
+                .Select(it => it?["payload"]?.Value<JObject>())
+                .Where(it => it != null) ?? 
+            new List<JObject>()
+        );
+
         public IEnumerable<JToken> GetCommentItemsFromNext()
         {
+            var contentUpdates = GetCommentContentsFromNextUpdate();
+            foreach (var contentUpdate in contentUpdates)
+            {
+                if (contentUpdate?.ContainsKey("commentEntityPayload") == true)
+                {
+                    var comment = contentUpdate["commentEntityPayload"];
+                    if (comment != null)
+                    {
+                        yield return comment;
+                    }
+                }
+            }
+
             var contents = GetCommentContentsFromNext();
             foreach (var content in contents)
             {
                 if (content?.ContainsKey("commentThreadRenderer") == true)
                 {
-                    var comment = content["commentThreadRenderer"];
-                    if (comment != null)
-                    {
-                        yield return comment;
-                    }
                     continue;
                 }
                 _TryGetContinuation(content);

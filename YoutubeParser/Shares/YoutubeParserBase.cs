@@ -24,7 +24,11 @@ namespace YoutubeParser.Shares
         protected string GetChannelUrl(string urlOrChannelId)
         {
             if (!urlOrChannelId.Contains("www.youtube.com"))
+            {
+                if (urlOrChannelId.Contains("@"))
+                    return $"https://www.youtube.com/{urlOrChannelId}";
                 return $"https://www.youtube.com/channel/{urlOrChannelId}";
+            }
             return urlOrChannelId;
         }
 

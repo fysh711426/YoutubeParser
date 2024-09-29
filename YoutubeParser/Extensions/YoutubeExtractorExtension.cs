@@ -41,6 +41,7 @@ namespace YoutubeParser.Extensions
 
         public static DateTime? TryGetJoinedDate(this string joinedDate)
         {
+            joinedDate = joinedDate.Replace("Joined", "");
             return DateTime.TryParse(joinedDate, DateTimeFormatInfo.InvariantInfo,
                 DateTimeStyles.None, out var result)
                     ? result : null;

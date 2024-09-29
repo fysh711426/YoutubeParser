@@ -19,36 +19,31 @@ namespace YoutubeParser.Channels
         );
 
         private JToken? TryGetHeader() => Memo.Cache(this, () =>
-            TryGetInitialData()?["header"]?["c4TabbedHeaderRenderer"]
+            TryGetInitialData()?["header"]?["pageHeaderRenderer"]
         );
 
-        private JToken? TryGetTabs() => Memo.Cache(this, () =>
-            TryGetInitialData()?["contents"]?["twoColumnBrowseResultsRenderer"]?["tabs"]
-        );
-
-        public JObject? TryGetSelectedTab() => Memo.Cache(this, () =>
-            TryGetTabs()?.Values<JObject>()
-                .Where(it => it?["tabRenderer"]?["selected"]?.Value<bool>() == true)
-                .FirstOrDefault()
+        private JToken? TryGetHeaderContent() => Memo.Cache(this, () =>
+            TryGetHeader()?["content"]?["pageHeaderViewModel"]
         );
 
         private JObject? TryGetAbout() => Memo.Cache(this, () =>
-            TryGetSelectedTab()?["tabRenderer"]?["content"]?["sectionListRenderer"]?["contents"]?
+            TryGetInitialData()?["onResponseReceivedEndpoints"]?
+                .FirstOrDefault()?["showEngagementPanelEndpoint"]?["engagementPanel"]?["engagementPanelSectionListRenderer"]?["content"]?["sectionListRenderer"]?["contents"]?
                 .FirstOrDefault()?["itemSectionRenderer"]?["contents"]?
-                .FirstOrDefault()?["channelAboutFullMetadataRenderer"]?
+                .FirstOrDefault()?["aboutChannelRenderer"]?["metadata"]?["aboutChannelViewModel"]?
                 .Value<JObject>()
         );
 
         public string GetTitle() => Memo.Cache(this, () =>
-            TryGetHeader()?["title"]?.Value<string>() ?? ""
+            TryGetHeader()?["pageTitle"]?.Value<string>() ?? ""
         );
 
         public string GetChannelId() => Memo.Cache(this, () =>
-             TryGetHeader()?["channelId"]?.Value<string>() ?? ""
+             TryGetAbout()?["channelId"]?.Value<string>() ?? ""
         );
 
         public string GetDescription() => Memo.Cache(this, () =>
-            TryGetAbout()?["description"]?["simpleText"]?.Value<string>() ?? ""
+            TryGetAbout()?["description"]?.Value<string>() ?? ""
         );
 
         public string GetCanonicalChannelUrl() => Memo.Cache(this, () =>
@@ -56,30 +51,30 @@ namespace YoutubeParser.Channels
         );
 
         public string GetCountry() => Memo.Cache(this, () =>
-            TryGetAbout()?["country"]?["simpleText"]?.Value<string>() ?? ""
+            TryGetAbout()?["country"]?.Value<string>() ?? ""
         );
 
         public long GetSubscriberCount() => Memo.Cache(this, () =>
-            TryGetHeader()?["subscriberCountText"]?["simpleText"]?.Value<string>()?.GetCountValue() ?? 0
+            TryGetAbout()?["subscriberCountText"]?.Value<string>()?.GetCountValue() ?? 0
         );
 
         public long GetViewCount() => Memo.Cache(this, () =>
-           TryGetAbout()?["viewCountText"]?["simpleText"]?.Value<string>()?.GetCountValue() ?? 0
+           TryGetAbout()?["viewCountText"]?.Value<string>()?.GetCountValue() ?? 0
         );
 
         public DateTime GetJoinedDate() => Memo.Cache(this, () =>
-            TryGetAbout()?["joinedDateText"]?["runs"]?.LastOrDefault()?["text"]?.Value<string>()?.TryGetJoinedDate() ?? default(DateTime)
+            TryGetAbout()?["joinedDateText"]?["content"]?.Value<string>()?.TryGetJoinedDate() ?? default(DateTime)
         );
 
         public List<Thumbnail> GetThumbnails() => Memo.Cache(this, () =>
-            TryGetHeader()?["avatar"]?["thumbnails"]?
+            TryGetHeaderContent()?["image"]?["decoratedAvatarViewModel"]?["avatar"]?["avatarViewModel"]?["image"]?["sources"]?
                 .Values<JObject>()
                 .Select(it => new ThumbnailExtractor(it).GetThumbnail())
                 .ToList() ?? new List<Thumbnail>()
         );
 
         public List<Thumbnail> GetBanners() => Memo.Cache(this, () =>
-            TryGetHeader()?["banner"]?["thumbnails"]?
+            TryGetHeaderContent()?["banner"]?["imageBannerViewModel"]?["image"]?["sources"]?
                 .Values<JObject>()
                 .Select(it => new ThumbnailExtractor(it).GetThumbnail())
                 .ToList() ?? new List<Thumbnail>()

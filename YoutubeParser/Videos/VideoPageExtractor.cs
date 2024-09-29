@@ -93,10 +93,9 @@ namespace YoutubeParser.Videos
         );
 
         public long? TryGetLikeCount() => Memo.Cache(this, () =>
-            _html?
-                .Pipe(it => Regex.Match(it, @"""label""\s*:\s*""([\d,\.]+) likes"""))
-                .Select(m => m.Groups[1].Value)
-                .Pipe(it => it.GetCountValue())
+            TryGetPrimaryInfo()?["videoActions"]?["menuRenderer"]?["topLevelButtons"]?
+                .FirstOrDefault()?["segmentedLikeDislikeButtonViewModel"]?["likeButtonViewModel"]?["likeButtonViewModel"]?["toggleButtonViewModel"]?["toggleButtonViewModel"]?["defaultButtonViewModel"]?["buttonViewModel"]?["title"]?
+                .Value<string>()?.GetCountValue() ?? 0
         );
 
         private JToken? TryGetPlayability() => Memo.Cache(this, () =>
